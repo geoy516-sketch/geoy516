@@ -42,3 +42,6 @@ section {
 #home { background-color: #f4f4f4; }
 #about { background-color: #ddd; }
 #contact { background-color: #bbb; }
+html {
+  scroll-behavior: smooth;
+}
