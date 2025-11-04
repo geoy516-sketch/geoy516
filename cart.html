@@ -28,6 +28,12 @@
     th { background-color: #4CAF50; color: white; }
     td:last-child { text-align: right; }
 
+    .remove-btn {
+      background: #e53935; color: white; border: none;
+      padding: 5px 10px; border-radius: 5px; cursor: pointer;
+    }
+    .remove-btn:hover { background: #b71c1c; }
+
     .total {
       text-align: right; width: 80%; margin: auto; font-size: 1.3em; color: #2e7d32;
     }
@@ -37,7 +43,6 @@
       padding: 12px 30px; border: none; border-radius: 5px; font-size: 1em;
       cursor: pointer; font-weight: bold;
     }
-
     .checkout-btn:hover { background: #2e7d32; }
 
     .empty { text-align: center; color: #666; margin-top: 50px; }
@@ -57,25 +62,44 @@
   <div id="cart-container"></div>
 
   <script>
-    const cartContainer = document.getElementById('cart-container');
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    function renderCart() {
+      const cartContainer = document.getElementById('cart-container');
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    if (cart.length === 0) {
-      cartContainer.innerHTML = '<p class="empty">Your cart is empty 🛍️</p>';
-    } else {
+      if (cart.length === 0) {
+        cartContainer.innerHTML = '<p class="empty">Your cart is empty 🛍️</p>';
+        return;
+      }
+
       let total = 0;
       let tableHTML = `
         <table>
-          <tr><th>Item</th><th>Price</th></tr>
+          <tr><th>Item</th><th>Price</th><th>Action</th></tr>
       `;
-      cart.forEach(item => {
-        tableHTML += `<tr><td>${item.name}</td><td>$${item.price.toFixed(2)}</td></tr>`;
+
+      cart.forEach((item, index) => {
+        tableHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>$${item.price.toFixed(2)}</td>
+            <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
+          </tr>
+        `;
         total += item.price;
       });
+
       tableHTML += `</table>`;
       tableHTML += `<p class="total"><strong>Total: $${total.toFixed(2)}</strong></p>`;
       tableHTML += `<button class="checkout-btn" onclick="checkout()">Checkout</button>`;
       cartContainer.innerHTML = tableHTML;
+    }
+
+    function removeItem(index) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const removed = cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert(`${removed[0].name} removed from your cart.`);
+      renderCart();
     }
 
     function checkout() {
@@ -83,6 +107,9 @@
       localStorage.removeItem('cart');
       window.location.href = 'index.html';
     }
+
+    // Render cart on page load
+    renderCart();
   </script>
 </body>
 </html>
