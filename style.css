@@ -44,23 +44,23 @@ footer {
   text-align: center;
   padding: 15px;
 }
-/* ===== Services Page - Green Theme ===== */
-.services-section {
+/* ===== Shop / Sale Page (Green Theme) ===== */
+.shop-section {
   padding: 60px 20px;
   text-align: center;
   background-color: #e8f5e9; /* light green background */
-  color: #2e7d32; /* deep green text */
+  color: #2e7d32;
 }
 
-.services-section h2 {
+.shop-section h2 {
   color: #1b5e20;
 }
 
-.services-section p {
+.shop-section p {
   color: #33691e;
 }
 
-.services-container {
+.shop-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 30px;
@@ -70,35 +70,44 @@ footer {
   margin-right: auto;
 }
 
-.service-box {
+.item-box {
   background-color: #ffffff;
-  padding: 30px 20px;
+  padding: 20px;
   border-radius: 12px;
-  border: 2px solid #a5d6a7; /* soft green border */
+  border: 2px solid #a5d6a7;
   box-shadow: 0 4px 8px rgba(46, 125, 50, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.service-box:hover {
+.item-box:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 12px rgba(46, 125, 50, 0.25);
 }
 
-.service-box h3 {
-  color: #1b5e20;
+.item-box img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
   margin-bottom: 15px;
 }
 
-.service-box p {
-  color: #33691e;
-  font-size: 15px;
-  margin-bottom: 20px;
+.item-box h3 {
+  color: #1b5e20;
+  margin-bottom: 10px;
+}
+
+.price {
+  font-size: 18px;
+  color: #2e7d32;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
 
 .btn {
   display: inline-block;
   padding: 8px 16px;
-  background-color: #388e3c; /* green button */
+  background-color: #388e3c;
   color: white;
   border-radius: 6px;
   text-decoration: none;
@@ -107,7 +116,7 @@ footer {
 }
 
 .btn:hover {
-  background-color: #2e7d32; /* darker green on hover */
+  background-color: #2e7d32;
 }
 
 /* Active Navbar Link */
@@ -115,12 +124,6 @@ footer {
   text-decoration: underline;
   color: #81c784;
 }
-/* ===== Services Images ===== */
-.service-box img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 15px;
+
 }
 
