@@ -15,7 +15,8 @@
     nav ul { list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; }
     nav ul li a { color: white; text-decoration: none; font-weight: bold; }
     nav ul li a:hover { text-decoration: underline; }
-    .search-bar input { padding: 8px; border-radius: 5px; border: none; }
+
+    .search-bar input { padding: 8px; border-radius: 5px; border: none; width: 200px; }
 
     header {
       background: linear-gradient(to right, #4CAF50, #2e7d32);
@@ -23,7 +24,17 @@
     }
 
     #sale-items { background-color: #e8f5e9; padding: 50px 20px; }
-    #sale-items h2 { text-align: center; color: #2e7d32; margin-bottom: 30px; }
+    #sale-items h2 { text-align: center; color: #2e7d32; margin-bottom: 20px; }
+
+    .filters {
+      text-align: center; margin-bottom: 30px;
+    }
+    .filters button {
+      padding: 8px 15px; margin: 5px; border: none; border-radius: 5px;
+      cursor: pointer; background-color: #4CAF50; color: white; font-weight: bold;
+    }
+    .filters button.active { background-color: #2e7d32; }
+    .filters button:hover { background-color: #2e7d32; }
 
     .items-container {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -58,7 +69,7 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="search-bar">
-      <input type="text" placeholder="Search items...">
+      <input type="text" id="search" placeholder="Search items..." onkeyup="applyFilters()">
     </div>
   </nav>
 
@@ -69,24 +80,39 @@
 
   <section id="sale-items">
     <h2>Items for Sale</h2>
-    <div class="items-container">
-      <div class="item">
+
+    <!-- Category Filters -->
+    <div class="filters">
+      <button class="active" onclick="setCategory('all', this)">All</button>
+      <button onclick="setCategory('sale', this)">Sale</button>
+      <button onclick="setCategory('new', this)">New Arrivals</button>
+      <button onclick="setCategory('accessory', this)">Accessories</button>
+    </div>
+
+    <div class="items-container" id="items-container">
+      <div class="item" data-category="sale">
         <img src="https://via.placeholder.com/250x200" alt="Item 1">
         <h3>Product 1</h3>
         <p>$15.00</p>
         <button onclick="addToCart('Product 1', 15)">Add to Cart</button>
       </div>
-      <div class="item">
+      <div class="item" data-category="new">
         <img src="https://via.placeholder.com/250x200" alt="Item 2">
         <h3>Product 2</h3>
         <p>$22.00</p>
         <button onclick="addToCart('Product 2', 22)">Add to Cart</button>
       </div>
-      <div class="item">
+      <div class="item" data-category="sale">
         <img src="https://via.placeholder.com/250x200" alt="Item 3">
         <h3>Product 3</h3>
         <p>$10.00</p>
         <button onclick="addToCart('Product 3', 10)">Add to Cart</button>
+      </div>
+      <div class="item" data-category="accessory">
+        <img src="https://via.placeholder.com/250x200" alt="Item 4">
+        <h3>Product 4</h3>
+        <p>$18.00</p>
+        <button onclick="addToCart('Product 4', 18)">Add to Cart</button>
       </div>
     </div>
   </section>
@@ -103,13 +129,46 @@
   </footer>
 
   <script>
-    // Save items to localStorage for cart
+    let selectedCategory = 'all';
+
+    // Cart functionality
     function addToCart(name, price) {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
       cart.push({ name, price });
       localStorage.setItem('cart', JSON.stringify(cart));
       alert(name + " has been added to your cart!");
     }
+
+    // Set selected category and apply filters
+    function setCategory(category, btn) {
+      selectedCategory = category;
+      document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    }
+
+    // Apply both search and category filters
+    function applyFilters() {
+      const searchInput = document.getElementById('search').value.toLowerCase();
+      const items = document.querySelectorAll('.items-container .item');
+
+      items.forEach(item => {
+        const title = item.querySelector('h3').textContent.toLowerCase();
+        const category = item.getAttribute('data-category');
+        const matchesSearch = title.includes(searchInput);
+        const matchesCategory = (selectedCategory === 'all' || category === selectedCategory);
+
+        if (matchesSearch && matchesCategory) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+
   </script>
 </body>
 </html>
