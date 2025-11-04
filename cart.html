@@ -61,71 +61,73 @@
   <div class="cart-container" id="cart-container"></div>
 
   <script>
+    // Render the cart
     function renderCart() {
       const cartContainer = document.getElementById('cart-container');
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-      if (cart.length === 0) {
+      if(cart.length === 0){
         cartContainer.innerHTML = '<p class="empty">Your cart is empty 🛍️</p>';
         return;
       }
 
       let total = 0;
-      let tableHTML = `
-        <table>
-          <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Subtotal</th>
-            <th>Action</th>
-          </tr>
-      `;
+      let tableHTML = `<table>
+        <tr>
+          <th>Item</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+          <th>Action</th>
+        </tr>`;
 
       cart.forEach((item, index) => {
-        const subtotal = item.price * (item.quantity || 1);
+        const qty = item.quantity || 1;
+        const subtotal = item.price * qty;
         total += subtotal;
-        tableHTML += `
-          <tr>
-            <td>${item.name}</td>
-            <td>$${item.price.toFixed(2)}</td>
-            <td><input type="number" min="1" value="${item.quantity || 1}" onchange="updateQuantity(${index}, this.value)"></td>
-            <td>$${subtotal.toFixed(2)}</td>
-            <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
-          </tr>
-        `;
+
+        tableHTML += `<tr>
+          <td>${item.name}</td>
+          <td>$${item.price.toFixed(2)}</td>
+          <td><input type="number" min="1" value="${qty}" onchange="updateQuantity(${index}, this.value)"></td>
+          <td>$${subtotal.toFixed(2)}</td>
+          <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
+        </tr>`;
       });
 
-      tableHTML += `</table>`;
-      tableHTML += `<p class="total"><strong>Total: $${total.toFixed(2)}</strong></p>`;
-      tableHTML += `<button class="checkout-btn" onclick="checkout()">Checkout</button>`;
+      tableHTML += `</table>
+        <p class="total"><strong>Total: $${total.toFixed(2)}</strong></p>
+        <button class="checkout-btn" onclick="checkout()">Checkout</button>`;
 
       cartContainer.innerHTML = tableHTML;
     }
 
-    function removeItem(index) {
+    // Remove item from cart
+    function removeItem(index){
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
       cart.splice(index, 1);
       localStorage.setItem('cart', JSON.stringify(cart));
       renderCart();
     }
 
-    function updateQuantity(index, quantity) {
+    // Update quantity
+    function updateQuantity(index, qty){
+      qty = parseInt(qty);
+      if(qty < 1) qty = 1;
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      quantity = parseInt(quantity);
-      if (quantity < 1) quantity = 1;
-      cart[index].quantity = quantity;
+      cart[index].quantity = qty;
       localStorage.setItem('cart', JSON.stringify(cart));
       renderCart();
     }
 
-    function checkout() {
+    // Checkout
+    function checkout(){
       alert('Thank you for your purchase!');
       localStorage.removeItem('cart');
       window.location.href = 'index.html';
     }
 
-    // Render cart on page load
+    // Render on page load
     renderCart();
   </script>
 
