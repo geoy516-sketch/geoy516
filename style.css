@@ -44,11 +44,20 @@ footer {
   text-align: center;
   padding: 15px;
 }
-/* ===== Services Page ===== */
+/* ===== Services Page - Green Theme ===== */
 .services-section {
   padding: 60px 20px;
   text-align: center;
-  background-color: #f8f8f8;
+  background-color: #e8f5e9; /* light green background */
+  color: #2e7d32; /* deep green text */
+}
+
+.services-section h2 {
+  color: #1b5e20;
+}
+
+.services-section p {
+  color: #33691e;
 }
 
 .services-container {
@@ -62,25 +71,26 @@ footer {
 }
 
 .service-box {
-  background-color: white;
+  background-color: #ffffff;
   padding: 30px 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #a5d6a7; /* soft green border */
+  box-shadow: 0 4px 8px rgba(46, 125, 50, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .service-box:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 12px rgba(46, 125, 50, 0.25);
 }
 
 .service-box h3 {
-  color: #333;
+  color: #1b5e20;
   margin-bottom: 15px;
 }
 
 .service-box p {
-  color: #666;
+  color: #33691e;
   font-size: 15px;
   margin-bottom: 20px;
 }
@@ -88,18 +98,21 @@ footer {
 .btn {
   display: inline-block;
   padding: 8px 16px;
-  background-color: #333;
+  background-color: #388e3c; /* green button */
   color: white;
   border-radius: 6px;
   text-decoration: none;
   font-weight: bold;
+  transition: background-color 0.2s ease;
 }
 
 .btn:hover {
-  background-color: #555;
+  background-color: #2e7d32; /* darker green on hover */
 }
 
-/* Highlight active page in navbar */
+/* Active Navbar Link */
 .nav-links a.active {
   text-decoration: underline;
+  color: #81c784;
 }
+
