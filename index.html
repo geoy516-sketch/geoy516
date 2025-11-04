@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Beta Store</title>
+  <title>Geo's Shop</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
 
@@ -55,13 +55,14 @@
     }
     .item button:hover { background-color: #2e7d32; }
 
-    #contact { background-color: #333; color: white; text-align: center; padding: 40px 20px; }
     footer { background: #222; color: #aaa; text-align: center; padding: 10px; font-size: 0.9em; }
   </style>
 </head>
 <body>
+
+  <!-- Navbar -->
   <nav>
-    <div class="logo">Beta Store</div>
+    <div class="logo">Geo's Shop</div>
     <ul>
       <li><a href="index.html">Home</a></li>
       <li><a href="#sale-items">Sale Items</a></li>
@@ -72,11 +73,13 @@
     </div>
   </nav>
 
-  <header id="home">
-    <h1>Welcome to Beta Online Shop</h1>
+  <!-- Header -->
+  <header>
+    <h1>Welcome to Geo's Online Shop</h1>
     <p>Find your favorite products at the best prices!</p>
   </header>
 
+  <!-- Sale Items Section -->
   <section id="sale-items">
     <h2>Items for Sale</h2>
 
@@ -89,48 +92,52 @@
     </div>
 
     <div class="items-container" id="items-container">
-      <div class="item" data-category="sale">
-        <img src="https://via.placeholder.com/250x200" alt="Item 1">
-        <h3>Product 1</h3>
-        <p>$15.00</p>
-        <button onclick="addToCart('Product 1', 15)">Add to Cart</button>
-      </div>
-      <div class="item" data-category="new">
-        <img src="https://via.placeholder.com/250x200" alt="Item 2">
-        <h3>Product 2</h3>
-        <p>$22.00</p>
-        <button onclick="addToCart('Product 2', 22)">Add to Cart</button>
-      </div>
-      <div class="item" data-category="sale">
-        <img src="https://via.placeholder.com/250x200" alt="Item 3">
-        <h3>Product 3</h3>
-        <p>$10.00</p>
-        <button onclick="addToCart('Product 3', 10)">Add to Cart</button>
-      </div>
-      <div class="item" data-category="accessory">
-        <img src="https://via.placeholder.com/250x200" alt="Item 4">
-        <h3>Product 4</h3>
-        <p>$18.00</p>
-        <button onclick="addToCart('Product 4', 18)">Add to Cart</button>
-      </div>
+      <!-- Products from Google Sheet will be injected here -->
     </div>
   </section>
 
-  <section id="contact">
-    <h2>Contact Us</h2>
-    <p>Email: contact@Beta.com</p>
-    <p>Phone: +1 (555) 123-4567</p>
-    <p>Location: Queens, NY</p>
-  </section>
-
   <footer>
-    &copy; 2025 Beta Store. All Rights Reserved.
+    &copy; 2025 Geo's Shop. All Rights Reserved.
   </footer>
 
+  <!-- PapaParse for CSV -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
+    let products = [];
     let selectedCategory = 'all';
+    const itemsContainer = document.getElementById('items-container');
 
-    // Cart functionality
+    // Replace with your published Google Sheet CSV link
+    const sheetCSVUrl = 'YOUR_GOOGLE_SHEET_CSV_URL';
+
+    // Fetch and parse products from Google Sheet
+    Papa.parse(sheetCSVUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        products = results.data.filter(p => p.Name); // Remove empty rows
+        displayProducts(products);
+      }
+    });
+
+    // Display products
+    function displayProducts(list) {
+      itemsContainer.innerHTML = '';
+      list.forEach(product => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.setAttribute('data-category', product.Category || 'all');
+        div.innerHTML = `
+          <img src="${product.Image}" alt="${product.Name}">
+          <h3>${product.Name}</h3>
+          <p>$${parseFloat(product.Price).toFixed(2)}</p>
+          <button onclick="addToCart('${product.Name}', ${parseFloat(product.Price)})">Add to Cart</button>
+        `;
+        itemsContainer.appendChild(div);
+      });
+    }
+
+    // Add product to cart
     function addToCart(name, price) {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
       cart.push({ name, price });
@@ -138,7 +145,7 @@
       alert(name + " has been added to your cart!");
     }
 
-    // Set selected category and apply filters
+    // Set selected category
     function setCategory(category, btn) {
       selectedCategory = category;
       document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
@@ -146,28 +153,17 @@
       applyFilters();
     }
 
-    // Apply both search and category filters
+    // Apply search + category filters
     function applyFilters() {
       const searchInput = document.getElementById('search').value.toLowerCase();
-      const items = document.querySelectorAll('.items-container .item');
-
-      items.forEach(item => {
+      document.querySelectorAll('.items-container .item').forEach(item => {
         const title = item.querySelector('h3').textContent.toLowerCase();
         const category = item.getAttribute('data-category');
         const matchesSearch = title.includes(searchInput);
         const matchesCategory = (selectedCategory === 'all' || category === selectedCategory);
-
-        if (matchesSearch && matchesCategory) {
-          item.style.display = '';
-        } else {
-          item.style.display = 'none';
-        }
+        item.style.display = matchesSearch && matchesCategory ? '' : 'none';
       });
     }
-  </script>
-</body>
-</html>
-
   </script>
 </body>
 </html>
