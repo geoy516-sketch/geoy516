@@ -92,15 +92,15 @@
     </div>
 
     <div class="items-container" id="items-container">
-      <!-- Products from Google Sheet will be injected here -->
+      <!-- Products from Google Sheet will appear here -->
     </div>
   </section>
 
   <footer>
-    &copy; 2025 Beta Shop. All Rights Reserved.
+    &copy; 2025 Geo's Shop. All Rights Reserved.
   </footer>
 
-  <!-- PapaParse for CSV -->
+  <!-- PapaParse -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
     let products = [];
@@ -110,51 +110,52 @@
     // Replace with your published Google Sheet CSV link
     const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?output=csv';
 
-    // Fetch and parse products from Google Sheet
+    // Fetch and parse CSV
     Papa.parse(sheetCSVUrl, {
       download: true,
       header: true,
-      complete: function(results) {
-        products = results.data.filter(p => p.Name); // Remove empty rows
+      complete: function(results){
+        products = results.data.filter(p => p.Name); // remove empty rows
         displayProducts(products);
       }
     });
 
     // Display products
-    function displayProducts(list) {
+    function displayProducts(list){
       itemsContainer.innerHTML = '';
       list.forEach(product => {
+        const price = parseFloat(product.Price.replace(/\s+/g, '')) || 0;
         const div = document.createElement('div');
         div.className = 'item';
         div.setAttribute('data-category', product.Category || 'all');
         div.innerHTML = `
           <img src="${product.Image}" alt="${product.Name}">
           <h3>${product.Name}</h3>
-          <p>$${parseFloat(product.Price).toFixed(2)}</p>
-          <button onclick="addToCart('${product.Name}', ${parseFloat(product.Price)})">Add to Cart</button>
+          <p>$${price.toFixed(2)}</p>
+          <button onclick="addToCart('${product.Name}', ${price})">Add to Cart</button>
         `;
         itemsContainer.appendChild(div);
       });
     }
 
-    // Add product to cart
-    function addToCart(name, price) {
+    // Add to cart
+    function addToCart(name, price){
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      cart.push({ name, price });
+      cart.push({name, price});
       localStorage.setItem('cart', JSON.stringify(cart));
-      alert(name + " has been added to your cart!");
+      alert(name + ' has been added to your cart!');
     }
 
-    // Set selected category
-    function setCategory(category, btn) {
+    // Category filter
+    function setCategory(category, btn){
       selectedCategory = category;
       document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       applyFilters();
     }
 
-    // Apply search + category filters
-    function applyFilters() {
+    // Search + category filter combined
+    function applyFilters(){
       const searchInput = document.getElementById('search').value.toLowerCase();
       document.querySelectorAll('.items-container .item').forEach(item => {
         const title = item.querySelector('h3').textContent.toLowerCase();
