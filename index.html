@@ -68,33 +68,36 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 
 <footer>© <span id="year"></span> SmashHub — No cart, order via email</footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-const SHEET_JSON_URL = "https://opensheet.elk.sh/YOUR_SHEET_ID/Sheet1"; // Use OpenSheet API for JSON
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?output=csv";
 
 let products = [];
 let filters = { search:"", category:"All", new:false };
 
-// Fetch Google Sheet as JSON
-fetch(SHEET_JSON_URL)
-  .then(res => res.json())
-  .then(data => {
-    products = data.filter(p => p.Name).map(p => ({
+// Fetch products from Google Sheet
+Papa.parse(SHEET_CSV_URL, {
+  download: true,
+  header: true,
+  complete: function(results) {
+    products = results.data.filter(p => p.Name).map(p => ({
       Name: p.Name,
       Brand: p.Brand || "",
-      Category: p.Category || "Accessories",
+      Category: (p.Category || "Accessories").trim(),
       Price: parseFloat(p.Price) || 0,
       Image: p.Image || "",
       Specs: p.Specs || "",
-      Tag: p.Tag || ""
+      Tag: (p.Tag || "").trim().toLowerCase()
     }));
     render();
-  })
-  .catch(err => {
-    alert("Error loading Google Sheet JSON");
+  },
+  error: function(err) {
+    alert("Error loading Google Sheet CSV");
     console.error(err);
-  });
+  }
+});
 
 // Render products
 function render() {
@@ -103,9 +106,17 @@ function render() {
   let list = products.slice();
 
   const q = filters.search.toLowerCase();
-  if(q) list = list.filter(p=>p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
-  if(filters.category!=="All") list = list.filter(p=>p.Category===filters.category);
-  if(filters.new) list = list.filter(p=>p.Tag==="new");
+  if(q) list = list.filter(p => p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
+
+  // Category filter
+  if(filters.category !== "All") {
+    list = list.filter(p => p.Category.toLowerCase() === filters.category.toLowerCase());
+  }
+
+  // New filter
+  if(filters.new) {
+    list = list.filter(p => p.Tag === "new");
+  }
 
   list.forEach(p => {
     const c = document.createElement("div");
@@ -123,22 +134,22 @@ function render() {
   });
 }
 
-// Category buttons
-document.querySelectorAll('.filters button[data-cat]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.filters button[data-cat]').forEach(b=>b.classList.remove('active'));
+// Filters
+document.querySelectorAll('.filters button[data-cat]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filters button[data-cat]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     filters.category = btn.dataset.cat;
+    filters.new = false; // reset new filter when switching category
     render();
   });
 });
 
-// "New" button toggle
-const newBtn = document.getElementById('newBtn');
-newBtn.addEventListener('click', ()=>{
+// New filter
+document.getElementById('newBtn').addEventListener('click', () => {
   filters.new = !filters.new;
-  newBtn.style.backgroundColor = filters.new ? "#047857" : "#fff";
-  newBtn.style.color = filters.new ? "#fff" : "#047857";
+  filters.category = "All"; // reset category when using new
+  document.querySelectorAll('.filters button[data-cat]').forEach(b => b.classList.remove('active'));
   render();
 });
 
@@ -148,26 +159,26 @@ function applyFilters() {
   render();
 }
 
-// Modal functions
-function openModal(p){
-  document.getElementById('modalBack').style.display="flex";
+// Modal
+function openModal(p) {
+  document.getElementById('modalBack').style.display = "flex";
   document.getElementById('mtitle').textContent = p.Name;
   document.getElementById('mimg').src = p.Image;
   document.getElementById('mname').textContent = p.Name;
-  document.getElementById('mbrand').textContent = p.Brand+" · "+p.Category;
-  document.getElementById('mprice').textContent = "$"+p.Price.toFixed(2);
+  document.getElementById('mbrand').textContent = p.Brand + " · " + p.Category;
+  document.getElementById('mprice').textContent = "$" + p.Price.toFixed(2);
   document.getElementById('mspecs').textContent = p.Specs;
-  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
-  document.getElementById('mailto').href = "mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
+  document.getElementById('copyBtn').onclick = () => {
+    navigator.clipboard.writeText(orderText(p)).then(() => alert("Copied!"));
+  }
+  document.getElementById('mailto').href = "mailto:sales@smashhub.example?subject=Order: " + encodeURIComponent(p.Name) + "&body=" + encodeURIComponent(orderText(p));
 }
-
-function closeModal(e){
-  if(e===true || e.target.id==='modalBack'){
-    document.getElementById('modalBack').style.display="none";
+function closeModal(e) {
+  if(e === true || e.target.id === 'modalBack') {
+    document.getElementById('modalBack').style.display = "none";
   }
 }
-
-function orderText(p){
+function orderText(p) {
   return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;
 }
 </script>
