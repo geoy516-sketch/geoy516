@@ -30,7 +30,6 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 </head>
 <body>
 
-<!-- Navbar -->
 <header class="nav">
   <div class="brand">SmashHub</div>
   <div class="filters">
@@ -45,10 +44,8 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
   <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
 </header>
 
-<!-- Product Grid -->
 <main class="grid" id="grid"></main>
 
-<!-- Modal -->
 <div class="modal-backdrop" id="modalBack" onclick="closeModal(event)">
   <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #eee">
@@ -72,35 +69,20 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 
 <footer>© <span id="year"></span> SmashHub — No cart, order via email</footer>
 
-<!-- PapaParse -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
-// Google Sheet CSV URL
-const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_LINK_HERE";
-
-// Variables
-let products = [];
-let filters = { search:"", category:"All", sale:false, new:false };
-let selectedProduct = null;
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Fetch products
-Papa.parse(SHEET_CSV_URL, {
-  download:true, header:true,
-  complete:(res)=> {
-    products = res.data.filter(p=>p.Name).map(p=>({
-      Name:p.Name,
-      Brand:p.Brand||"",
-      Category:p.Category||"Accessories",
-      Price:parseFloat(p.Price)||0,
-      Image:p.Image||"",
-      Specs:p.Specs||"",
-      Tag:p.Tag||""
-    }));
-    render();
-  },
-  error:()=>{alert("Error loading Google Sheet CSV")}
-});
+// Example product list (for demo)
+let products = [
+  {Name:"Astrox 88D Pro", Brand:"Yonex", Category:"Rackets", Price:259.99, Image:"assets/racket1.jpg", Specs:"4U/G5 · Stiff", Tag:"new"},
+  {Name:"Victor Auraspeed", Brand:"Victor", Category:"Rackets", Price:229.95, Image:"assets/racket2.jpg", Specs:"4U/G5 · Medium", Tag:"sale"},
+  {Name:"Yonex Power Cushion", Brand:"Yonex", Category:"Shoes", Price:120.00, Image:"assets/shoe1.jpg", Specs:"Men US 9", Tag:"new"},
+  {Name:"Victor SH-A920", Brand:"Victor", Category:"Shoes", Price:110.00, Image:"assets/shoe2.jpg", Specs:"Women US 8", Tag:"sale"},
+  {Name:"BG65 Strings", Brand:"Yonex", Category:"Strings", Price:15.00, Image:"assets/string1.jpg", Specs:"0.70mm", Tag:"sale"},
+  {Name:"Grip Tape", Brand:"Yonex", Category:"Accessories", Price:5.00, Image:"assets/accessory1.jpg", Specs:"1 pc", Tag:"new"}
+];
+
+let filters = { search:"", category:"All", sale:false, new:false };
 
 // Render products
 function render(){
@@ -108,18 +90,13 @@ function render(){
   grid.innerHTML="";
   let list = products.slice();
 
-  // Search
   const q = filters.search.toLowerCase();
   if(q) list = list.filter(p=>p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
 
-  // Category
   if(filters.category!=="All") list = list.filter(p=>p.Category===filters.category);
+  if(filters.sale) list = list.filter(p=>p.Tag==="sale");
+  if(filters.new) list = list.filter(p=>p.Tag==="new");
 
-  // Sale/New
-  if(filters.sale) list = list.filter(p=>p.Tag.toLowerCase()==="sale");
-  if(filters.new) list = list.filter(p=>p.Tag.toLowerCase()==="new");
-
-  // Create cards
   list.forEach(p=>{
     const c = document.createElement("div"); c.className="card";
     c.innerHTML=`
@@ -134,6 +111,7 @@ function render(){
     grid.appendChild(c);
   });
 }
+render();
 
 // Filters
 document.querySelectorAll('.filters button[data-cat]').forEach(btn=>{
@@ -146,12 +124,10 @@ document.querySelectorAll('.filters button[data-cat]').forEach(btn=>{
 });
 document.getElementById('saleBtn').addEventListener('click', ()=>{filters.sale=!filters.sale; render();});
 document.getElementById('newBtn').addEventListener('click', ()=>{filters.new=!filters.new; render();});
-
 function applyFilters(){filters.search=document.getElementById('search').value; render();}
 
 // Modal
 function openModal(p){
-  selectedProduct=p;
   document.getElementById('modalBack').style.display="flex";
   document.getElementById('mtitle').textContent=p.Name;
   document.getElementById('mimg').src=p.Image;
@@ -163,10 +139,7 @@ function openModal(p){
   document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
 }
 function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
-
 function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
 </script>
 </body>
-</html>
-
 </html>
