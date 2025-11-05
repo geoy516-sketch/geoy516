@@ -6,27 +6,37 @@
 <title>SmashHub - Badminton Gear</title>
 <style>
 body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
-a{ text-decoration:none; }
 .nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
 .nav .brand{font-weight:800;font-size:1.2rem;}
 .nav .menu{display:flex;gap:16px;position:relative;}
 .nav .menu > .dropdown{position:relative;}
-.nav .menu button, .nav .menu a button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;transition:0.2s;}
-.nav .menu button:hover, .nav .menu a button.active{background:#047857;color:#fff;}
+.nav .menu button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;transition:0.2s;}
+.nav .menu button:hover, .nav .menu button.active{background:#047857;color:#fff;}
 .nav .submenu{position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;display:flex;flex-direction:column;
-  box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:5;opacity:0;pointer-events:none;transform:translateY(5px);
-  transition:opacity 0.25s ease, transform 0.25s ease;}
-.dropdown.open .submenu{opacity:1;pointer-events:auto;transform:translateY(0);}
+  box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:5;
+  opacity:0;pointer-events:none;transform:translateY(5px);
+  transition:opacity 0.25s ease, transform 0.25s ease;
+}
+.dropdown.open .submenu{
+  opacity:1;pointer-events:auto;transform:translateY(0);
+}
 .nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;transition:0.2s;}
 .nav .submenu button:hover, .nav .submenu button.active{background:#10b981;color:#fff;}
 .nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
-main{max-width:1100px;margin:20px auto;padding:0 20px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
 .card img{width:100%;height:200px;object-fit:cover;}
 .card .body{padding:12px;display:flex;flex-direction:column;gap:8px;}
 .card .brandline{display:flex;justify-content:space-between;color:#555;font-size:0.9rem;}
+.card button{padding:8px;border:none;border-radius:8px;background:#047857;color:#fff;font-weight:700;cursor:pointer;}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:20px;}
+.modal{max-width:700px;width:100%;background:#fff;border-radius:12px;overflow:hidden;}
+.modal .content{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;}
+.modal img{width:100%;height:100%;object-fit:cover;border-radius:8px;}
+.modal .meta{display:flex;flex-direction:column;gap:8px;}
+.modal .close{margin-left:auto;padding:6px;border:none;background:#eee;border-radius:8px;cursor:pointer;}
 footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;color:#666;}
+@media(max-width:700px){.modal .content{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -70,19 +80,39 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
       </div>
     </div>
 
-    <a href="about.html"><button>About Us</button></a>
     <button id="locationBtn">Location</button>
   </div>
-
   <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
 </header>
 
 <main class="grid" id="grid"></main>
 
-<footer>© <span id="year"></span> SmashHub</footer>
+<div class="modal-backdrop" id="modalBack" onclick="closeModal(event)">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #eee">
+      <strong id="mtitle">Product</strong>
+      <button class="close" onclick="closeModal(true)">✕</button>
+    </div>
+    <div class="content">
+      <img id="mimg" src="" alt="">
+      <div class="meta">
+        <div id="mname" style="font-weight:800"></div>
+        <div class="brandline"><span id="mbrand"></span><span id="mprice"></span></div>
+        <div id="mspecs" style="color:#555;"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button id="copyBtn">Copy Order Text</button>
+          <a id="mailto" target="_blank" style="padding:8px;border:1px solid #ddd;border-radius:8px;text-decoration:none;color:#555;">Email to Order</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>© <span id="year"></span> SmashHub — No cart, order via email</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
+// JS for fetching Google Sheets, filtering, rendering, and modal
 document.getElementById('year').textContent = new Date().getFullYear();
 
 const SHEET_URLS = [
@@ -97,20 +127,26 @@ let filters = { search:"", brand:null, category:null };
 function fetchAllSheets() {
   let loaded = 0;
   SHEET_URLS.forEach(sheet => {
-    Papa.parse(sheet.url, { download: true, header: true, complete: function(results){
-      const sheetProducts = results.data.filter(p => p.Name).map(p => ({
-        Name: p.Name,
-        Brand: sheet.brand,
-        Category: p.Category || "Accessories",
-        Price: parseFloat(p.Price) || 0,
-        Image: p.Image || "",
-        Specs: p.Specs || "",
-        Tag: p.Tag || ""
-      }));
-      products = products.concat(sheetProducts);
-      loaded++;
-      if(loaded === SHEET_URLS.length) render();
-    }});
+    Papa.parse(sheet.url, {
+      download: true,
+      header: true,
+      complete: function(results){
+        const sheetProducts = results.data
+          .filter(p => p.Name)
+          .map(p => ({
+            Name: p.Name,
+            Brand: sheet.brand,
+            Category: p.Category || "Accessories",
+            Price: parseFloat(p.Price) || 0,
+            Image: p.Image || "",
+            Specs: p.Specs || "",
+            Tag: p.Tag || ""
+          }));
+        products = products.concat(sheetProducts);
+        loaded++;
+        if(loaded === SHEET_URLS.length) render();
+      }
+    });
   });
 }
 fetchAllSheets();
@@ -119,29 +155,25 @@ function render(){
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
   let list = products.slice();
+
   if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()) || p.Brand.toLowerCase().includes(filters.search.toLowerCase()));
   if(filters.brand) list = list.filter(p => p.Brand === filters.brand);
   if(filters.category) list = list.filter(p => p.Category === filters.category);
+
   list.forEach(p=>{
     const c = document.createElement("div"); c.className="card";
-    c.innerHTML=`<img src="${p.Image}" alt="${p.Name}"><div class="body"><div style="font-weight:800">${p.Name}</div><div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div></div>`;
+    c.innerHTML=`
+      <img src="${p.Image}" alt="${p.Name}">
+      <div class="body">
+        <div style="font-weight:800">${p.Name}</div>
+        <div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div>
+        <button onclick='openModal(${JSON.stringify(p)})'>View</button>
+      </div>
+    `;
     grid.appendChild(c);
   });
 }
 
-// Dropdown click-to-open
-document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-  toggle.addEventListener('click', e => {
-    e.stopPropagation();
-    const dropdown = toggle.parentElement;
-    const isOpen = dropdown.classList.contains('open');
-    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
-    if(!isOpen) dropdown.classList.add('open');
-  });
-});
-document.addEventListener('click', () => document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open')));
-
-// Filter products by submenu button
 document.querySelectorAll('.submenu button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.submenu button').forEach(b => b.classList.remove('active'));
@@ -153,6 +185,36 @@ document.querySelectorAll('.submenu button').forEach(btn=>{
 });
 
 function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
+
+// Dropdown click-to-open
+document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dropdown = toggle.parentElement;
+    const isOpen = dropdown.classList.contains('open');
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+    if (!isOpen) dropdown.classList.add('open');
+  });
+});
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+});
+
+// Modal
+function openModal(p){
+  document.getElementById('modalBack').style.display="flex";
+  document.getElementById('mtitle').textContent=p.Name;
+  document.getElementById('mimg').src=p.Image;
+  document.getElementById('mname').textContent=p.Name;
+  document.getElementById('mbrand').textContent=p.Brand+" · "+p.Category;
+  document.getElementById('mprice').textContent="$"+p.Price.toFixed(2);
+  document.getElementById('mspecs').textContent=p.Specs;
+  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
+  document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
+}
+function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
+function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
 </script>
 </body>
 </html>
