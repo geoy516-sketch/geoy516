@@ -17,7 +17,9 @@ body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
   opacity:0;pointer-events:none;transform:translateY(5px);
   transition:opacity 0.25s ease, transform 0.25s ease;
 }
-.dropdown.open .submenu{opacity:1;pointer-events:auto;transform:translateY(0);}
+.dropdown.open .submenu{
+  opacity:1;pointer-events:auto;transform:translateY(0);
+}
 .nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;transition:0.2s;}
 .nav .submenu button:hover, .nav .submenu button.active{background:#10b981;color:#fff;}
 .nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
@@ -32,6 +34,8 @@ body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .modal .content{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;}
 .modal img{width:100%;height:100%;object-fit:cover;border-radius:8px;}
 .modal .meta{display:flex;flex-direction:column;gap:8px;}
+.modal .meta input, .modal .meta textarea, .modal .meta select{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;}
+.modal .buttons{display:flex;gap:8px;margin-top:10px;}
 .modal .close{margin-left:auto;padding:6px;border:none;background:#eee;border-radius:8px;cursor:pointer;}
 footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;color:#666;}
 @media(max-width:700px){.modal .content{grid-template-columns:1fr;}}
@@ -42,7 +46,7 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <header class="nav">
   <div class="brand">SmashHub</div>
   <div class="menu">
-    <button id="allBtn">All</button>
+    <a href="index.html"><button>All</button></a>
     <div class="dropdown">
       <button class="dropdown-toggle">Yonex</button>
       <div class="submenu">
@@ -84,18 +88,38 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <div class="modal-backdrop" id="modalBack" onclick="closeModal(event)">
   <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #eee">
-      <strong id="mtitle">Product</strong>
+      <strong>Product Details</strong>
       <button class="close" onclick="closeModal(true)">✕</button>
     </div>
     <div class="content">
       <img id="mimg" src="" alt="">
       <div class="meta">
-        <div id="mname" style="font-weight:800"></div>
-        <div class="brandline"><span id="mbrand"></span><span id="mprice"></span></div>
-        <div id="mspecs" style="color:#555;"></div>
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          <button id="copyBtn">Copy Order Text</button>
-          <a id="mailto" target="_blank" style="padding:8px;border:1px solid #ddd;border-radius:8px;text-decoration:none;color:#555;">Email to Order</a>
+        <label>Name</label><input id="mname" type="text">
+        <label>Brand</label>
+        <select id="mbrand">
+          <option>Yonex</option>
+          <option>Li-Ning</option>
+          <option>Victor</option>
+        </select>
+        <label>Category</label>
+        <select id="mcat">
+          <option>Racket</option>
+          <option>Shoes</option>
+          <option>Strings</option>
+          <option>Bag</option>
+          <option>Accessories</option>
+        </select>
+        <label>Price</label><input id="mprice" type="number">
+        <label>Specs</label><textarea id="mspecs" rows="4"></textarea>
+        <label>Tag</label>
+        <select id="mtag">
+          <option></option>
+          <option>new</option>
+          <option>sale</option>
+        </select>
+        <div class="buttons">
+          <button id="saveBtn">Save</button>
+          <button onclick="closeModal(true)">Close</button>
         </div>
       </div>
     </div>
@@ -116,6 +140,7 @@ const SHEET_URLS = [
 
 let products = [];
 let filters = { search:"", brand:null, category:null };
+let currentEdit = null;
 
 function fetchAllSheets() {
   let loaded = 0;
@@ -148,19 +173,18 @@ function render(){
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
   let list = products.slice();
-
   if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()) || p.Brand.toLowerCase().includes(filters.search.toLowerCase()));
   if(filters.brand) list = list.filter(p => p.Brand === filters.brand);
   if(filters.category) list = list.filter(p => p.Category === filters.category);
 
-  list.forEach(p=>{
+  list.forEach((p, i)=>{
     const c = document.createElement("div"); c.className="card";
     c.innerHTML=`
       <img src="${p.Image}" alt="${p.Name}">
       <div class="body">
         <div style="font-weight:800">${p.Name}</div>
         <div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div>
-        <button onclick='openModal(${JSON.stringify(p)})'>View Details</button>
+        <button onclick='openModal(${i})'>View & Edit</button>
       </div>
     `;
     grid.appendChild(c);
@@ -169,43 +193,54 @@ function render(){
 
 document.querySelectorAll('.submenu button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.submenu button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
     filters.brand = btn.dataset.brand;
     filters.category = btn.dataset.cat;
     render();
   });
 });
-document.getElementById('allBtn').addEventListener('click', ()=>{ filters.brand=null; filters.category=null; render(); });
-function applyFilters(){ filters.search=document.getElementById('search').value; render(); }
+function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
 
-function openModal(p){
+function openModal(index){
+  currentEdit = index;
+  const p = products[index];
   document.getElementById('modalBack').style.display="flex";
-  document.getElementById('mtitle').textContent=p.Name;
   document.getElementById('mimg').src=p.Image;
-  document.getElementById('mname').textContent=p.Name;
-  document.getElementById('mbrand').textContent=p.Brand+" · "+p.Category;
-  document.getElementById('mprice').textContent="$"+p.Price.toFixed(2);
-  document.getElementById('mspecs').textContent=p.Specs;
-  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
-  document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
+  document.getElementById('mname').value=p.Name;
+  document.getElementById('mbrand').value=p.Brand;
+  document.getElementById('mcat').value=p.Category;
+  document.getElementById('mprice').value=p.Price;
+  document.getElementById('mspecs').value=p.Specs;
+  document.getElementById('mtag').value=p.Tag;
 }
-function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
-function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
 
-// Dropdown click-to-open
-document.querySelectorAll('.dropdown-toggle').forEach(toggle=>{
+document.getElementById('saveBtn').addEventListener('click', ()=>{
+  if(currentEdit !== null){
+    const p = products[currentEdit];
+    p.Name = document.getElementById('mname').value;
+    p.Brand = document.getElementById('mbrand').value;
+    p.Category = document.getElementById('mcat').value;
+    p.Price = parseFloat(document.getElementById('mprice').value) || 0;
+    p.Specs = document.getElementById('mspecs').value;
+    p.Tag = document.getElementById('mtag').value;
+    render();
+    closeModal(true);
+  }
+});
+
+function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
+
+// Dropdown toggle
+document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
   toggle.addEventListener('click', (e)=>{
     e.stopPropagation();
     const dropdown = toggle.parentElement;
     const isOpen = dropdown.classList.contains('open');
-    document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('open'));
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
     if(!isOpen) dropdown.classList.add('open');
   });
 });
-document.addEventListener('click', ()=>{
-  document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('open'));
-});
+document.addEventListener('click', ()=>{document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));});
 </script>
+
 </body>
 </html>
