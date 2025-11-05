@@ -38,7 +38,6 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
     <button data-cat="Shoes">Shoes</button>
     <button data-cat="Strings">Strings</button>
     <button data-cat="Accessories">Accessories</button>
-    <button id="saleBtn">Sale</button>
     <button id="newBtn">New</button>
   </div>
   <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
@@ -77,7 +76,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?output=csv";
 
 let products = [];
-let filters = { search:"", category:"All", sale:false, new:false };
+let filters = { search:"", category:"All", new:false };
 
 // Fetch products from Google Sheet
 Papa.parse(SHEET_CSV_URL, {
@@ -110,7 +109,6 @@ function render(){
   const q = filters.search.toLowerCase();
   if(q) list = list.filter(p=>p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
   if(filters.category!=="All") list = list.filter(p=>p.Category===filters.category);
-  if(filters.sale) list = list.filter(p=>p.Tag==="sale");
   if(filters.new) list = list.filter(p=>p.Tag==="new");
 
   list.forEach(p=>{
@@ -120,7 +118,7 @@ function render(){
       <div class="body">
         <div style="font-weight:800">${p.Name}</div>
         <div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div>
-        <div style="display:flex;gap:6px;margin-top:6px;">${p.Tag==="sale"?'<span style="color:red;font-weight:700;">SALE</span>':''}${p.Tag==="new"?'<span style="color:green;font-weight:700;">NEW</span>':''}</div>
+        <div style="display:flex;gap:6px;margin-top:6px;">${p.Tag==="new"?'<span style="color:green;font-weight:700;">NEW</span>':''}</div>
         <button onclick='openModal(${JSON.stringify(p)})'>View</button>
       </div>
     `;
@@ -137,7 +135,7 @@ document.querySelectorAll('.filters button[data-cat]').forEach(btn=>{
     render();
   });
 });
-document.getElementById('saleBtn').addEventListener('click', ()=>{filters.sale=!filters.sale; render();});
+
 document.getElementById('newBtn').addEventListener('click', ()=>{filters.new=!filters.new; render();});
 function applyFilters(){filters.search=document.getElementById('search').value; render();}
 
@@ -154,7 +152,4 @@ function openModal(p){
   document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
 }
 function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
-function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
-</script>
-</body>
-</html>
+function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price
