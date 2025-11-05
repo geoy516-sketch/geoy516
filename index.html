@@ -1,157 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Badminton Pro Shop</title>
-  <link rel="stylesheet" href="assets/style.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-    }
-    header {
-      background: #222;
-      color: white;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      font-size: 22px;
-      font-weight: bold;
-      color: #00bcd4;
-    }
-    nav ul {
-      list-style: none;
-      display: flex;
-      margin: 0;
-      padding: 0;
-    }
-    nav ul li {
-      position: relative;
-      margin: 0 15px;
-    }
-    nav ul li a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 8px 12px;
-      transition: background 0.3s;
-    }
-    nav ul li a:hover {
-      background: #00bcd4;
-      border-radius: 4px;
-    }
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background: white;
-      min-width: 160px;
-      z-index: 1;
-      border-radius: 5px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    .dropdown-content a {
-      color: #333;
-      padding: 10px 15px;
-      display: block;
-      text-decoration: none;
-    }
-    .dropdown-content a:hover {
-      background: #00bcd4;
-      color: white;
-    }
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
-    .search-container {
-      margin-left: 20px;
-    }
-    .search-container input {
-      padding: 7px 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    iframe {
-      width: 100%;
-      height: 100vh;
-      border: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmashHub - Badminton Gear</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
+a{ text-decoration:none; }
+.nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
+.nav .brand{font-weight:800;font-size:1.2rem;}
+.nav .menu{display:flex;gap:16px;position:relative;}
+.nav .menu > .dropdown{position:relative;}
+.nav .menu button, .nav .menu a button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;transition:0.2s;}
+.nav .menu button:hover, .nav .menu a button.active{background:#047857;color:#fff;}
+.nav .submenu{position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;display:flex;flex-direction:column;
+  box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:5;opacity:0;pointer-events:none;transform:translateY(5px);
+  transition:opacity 0.25s ease, transform 0.25s ease;}
+.dropdown.open .submenu{opacity:1;pointer-events:auto;transform:translateY(0);}
+.nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;transition:0.2s;}
+.nav .submenu button:hover, .nav .submenu button.active{background:#10b981;color:#fff;}
+.nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
+main{max-width:1100px;margin:20px auto;padding:0 20px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
+.card img{width:100%;height:200px;object-fit:cover;}
+.card .body{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.card .brandline{display:flex;justify-content:space-between;color:#555;font-size:0.9rem;}
+footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;color:#666;}
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">Badminton Pro</div>
-    <nav>
-      <ul>
-        <li><a href="about.html">About Us</a></li>
-        <li class="dropdown">
-          <a href="#">All</a>
-          <div class="dropdown-content">
-            <a href="#" onclick="loadSheet('allYonex')">Yonex</a>
-            <a href="#" onclick="loadSheet('allLiNing')">Li-Ning</a>
-            <a href="#" onclick="loadSheet('allVictor')">Victor</a>
-          </div>
-        </li>
-        <li class="dropdown">
-          <a href="#">Yonex</a>
-          <div class="dropdown-content">
-            <a href="#" onclick="loadSheet('yonexRacket')">Rackets</a>
-            <a href="#" onclick="loadSheet('yonexShoes')">Shoes</a>
-            <a href="#" onclick="loadSheet('yonexStrings')">Strings</a>
-            <a href="#" onclick="loadSheet('yonexBag')">Bags</a>
-            <a href="#" onclick="loadSheet('yonexAccessories')">Accessories</a>
-          </div>
-        </li>
-        <li class="dropdown">
-          <a href="#">Li-Ning</a>
-          <div class="dropdown-content">
-            <a href="#" onclick="loadSheet('liningRacket')">Rackets</a>
-            <a href="#" onclick="loadSheet('liningShoes')">Shoes</a>
-            <a href="#" onclick="loadSheet('liningStrings')">Strings</a>
-            <a href="#" onclick="loadSheet('liningBag')">Bags</a>
-            <a href="#" onclick="loadSheet('liningAccessories')">Accessories</a>
-          </div>
-        </li>
-        <li class="dropdown">
-          <a href="#">Victor</a>
-          <div class="dropdown-content">
-            <a href="#" onclick="loadSheet('victorRacket')">Rackets</a>
-            <a href="#" onclick="loadSheet('victorShoes')">Shoes</a>
-            <a href="#" onclick="loadSheet('victorStrings')">Strings</a>
-            <a href="#" onclick="loadSheet('victorBag')">Bags</a>
-            <a href="#" onclick="loadSheet('victorAccessories')">Accessories</a>
-          </div>
-        </li>
-        <li><a href="#" onclick="loadSheet('location')">Location</a></li>
-      </ul>
-    </nav>
-    <div class="search-container">
-      <input type="text" id="searchBar" placeholder="Search..." autocomplete="off">
+
+<header class="nav">
+  <div class="brand">SmashHub</div>
+  <div class="menu">
+    <a href="index.html"><button class="active">All</button></a>
+
+    <div class="dropdown">
+      <button class="dropdown-toggle">Yonex</button>
+      <div class="submenu">
+        <button data-brand="Yonex" data-cat="Racket">Racket</button>
+        <button data-brand="Yonex" data-cat="Shoes">Shoes</button>
+        <button data-brand="Yonex" data-cat="Strings">Strings</button>
+        <button data-brand="Yonex" data-cat="Bag">Bag</button>
+        <button data-brand="Yonex" data-cat="Accessories">Accessories</button>
+      </div>
     </div>
-  </header>
 
-  <iframe id="sheetFrame" src=""></iframe>
+    <div class="dropdown">
+      <button class="dropdown-toggle">Li-Ning</button>
+      <div class="submenu">
+        <button data-brand="Li-Ning" data-cat="Racket">Racket</button>
+        <button data-brand="Li-Ning" data-cat="Shoes">Shoes</button>
+        <button data-brand="Li-Ning" data-cat="Strings">Strings</button>
+        <button data-brand="Li-Ning" data-cat="Bag">Bag</button>
+        <button data-brand="Li-Ning" data-cat="Accessories">Accessories</button>
+      </div>
+    </div>
 
-  <script>
-    const sheetLinks = {
-      allYonex: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pubhtml?gid=0&single=true",
-      allLiNing: "https://docs.google.com/spreadsheets/d/e/.../pubhtml?gid=1&single=true",
-      allVictor: "https://docs.google.com/spreadsheets/d/e/.../pubhtml?gid=2&single=true",
-      yonexRacket: "https://docs.google.com/spreadsheets/d/e/.../pubhtml?gid=3&single=true",
-      yonexShoes: "https://docs.google.com/spreadsheets/d/e/.../pubhtml?gid=4&single=true",
-      yonexStrings: "https://docs.google.com/spreadsheets/d/e/.../pubhtml?gid=5&single=true",
-      yonexBag: "https://docs.google.com/spreadsheets/d/e/.../pubhtml?gid=6&single=true",
-      yonexAccessories: "https://docs.google.com/spreadsheets/d/e/.../pubhtml?gid=7&single=true",
-      location: "https://docs.google.com/spreadsheets/d/e/.../pubhtml?gid=10&single=true"
-    };
+    <div class="dropdown">
+      <button class="dropdown-toggle">Victor</button>
+      <div class="submenu">
+        <button data-brand="Victor" data-cat="Racket">Racket</button>
+        <button data-brand="Victor" data-cat="Shoes">Shoes</button>
+        <button data-brand="Victor" data-cat="Strings">Strings</button>
+        <button data-brand="Victor" data-cat="Bag">Bag</button>
+        <button data-brand="Victor" data-cat="Accessories">Accessories</button>
+      </div>
+    </div>
 
-    function loadSheet(sheetKey) {
-      document.getElementById("sheetFrame").src = sheetLinks[sheetKey];
-    }
-  </script>
+    <a href="about.html"><button>About Us</button></a>
+    <button id="locationBtn">Location</button>
+  </div>
+
+  <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
+</header>
+
+<main class="grid" id="grid"></main>
+
+<footer>© <span id="year"></span> SmashHub</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const SHEET_URLS = [
+  { brand: "Yonex", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=0&single=true&output=csv" },
+  { brand: "Li-Ning", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1964036999&single=true&output=csv" },
+  { brand: "Victor", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1101170186&single=true&output=csv" }
+];
+
+let products = [];
+let filters = { search:"", brand:null, category:null };
+
+function fetchAllSheets() {
+  let loaded = 0;
+  SHEET_URLS.forEach(sheet => {
+    Papa.parse(sheet.url, { download: true, header: true, complete: function(results){
+      const sheetProducts = results.data.filter(p => p.Name).map(p => ({
+        Name: p.Name,
+        Brand: sheet.brand,
+        Category: p.Category || "Accessories",
+        Price: parseFloat(p.Price) || 0,
+        Image: p.Image || "",
+        Specs: p.Specs || "",
+        Tag: p.Tag || ""
+      }));
+      products = products.concat(sheetProducts);
+      loaded++;
+      if(loaded === SHEET_URLS.length) render();
+    }});
+  });
+}
+fetchAllSheets();
+
+function render(){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = "";
+  let list = products.slice();
+  if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()) || p.Brand.toLowerCase().includes(filters.search.toLowerCase()));
+  if(filters.brand) list = list.filter(p => p.Brand === filters.brand);
+  if(filters.category) list = list.filter(p => p.Category === filters.category);
+  list.forEach(p=>{
+    const c = document.createElement("div"); c.className="card";
+    c.innerHTML=`<img src="${p.Image}" alt="${p.Name}"><div class="body"><div style="font-weight:800">${p.Name}</div><div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div></div>`;
+    grid.appendChild(c);
+  });
+}
+
+// Dropdown click-to-open
+document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+  toggle.addEventListener('click', e => {
+    e.stopPropagation();
+    const dropdown = toggle.parentElement;
+    const isOpen = dropdown.classList.contains('open');
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+    if(!isOpen) dropdown.classList.add('open');
+  });
+});
+document.addEventListener('click', () => document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open')));
+
+// Filter products by submenu button
+document.querySelectorAll('.submenu button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.submenu button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filters.brand = btn.dataset.brand;
+    filters.category = btn.dataset.cat;
+    render();
+  });
+});
+
+function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
+</script>
 </body>
 </html>
