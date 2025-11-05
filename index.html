@@ -13,14 +13,11 @@ body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .nav .filters button.active{background:#047857;color:#fff;}
 .nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
-.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;opacity:1;transition:opacity 0.3s ease;}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
 .card img{width:100%;height:200px;object-fit:cover;}
 .card .body{padding:12px;display:flex;flex-direction:column;gap:8px;}
 .card .brandline{display:flex;justify-content:space-between;color:#555;font-size:0.9rem;}
 .card button{padding:8px;border:none;border-radius:8px;background:#047857;color:#fff;font-weight:700;cursor:pointer;}
-.card .tag{opacity:0;transform:translateY(-5px);transition:opacity 0.4s ease, transform 0.4s ease;font-weight:700;padding:2px 6px;border-radius:6px;}
-.card .tag.new{color:#fff;background-color:#10b981;}
-.card .tag.visible{opacity:1;transform:translateY(0);}
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:20px;}
 .modal{max-width:700px;width:100%;background:#fff;border-radius:12px;overflow:hidden;}
 .modal .content{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;}
@@ -29,6 +26,7 @@ body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .modal .close{margin-left:auto;padding:6px;border:none;background:#eee;border-radius:8px;cursor:pointer;}
 footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;color:#666;}
 @media(max-width:700px){.modal .content{grid-template-columns:1fr;}}
+.tag.new{color:green;font-weight:700;}
 </style>
 </head>
 <body>
@@ -75,10 +73,11 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Your published Google Sheet CSV link (make sure it's output=csv)
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?output=csv";
 
 let products = [];
-let filters = { search:"", category:"All", new:false };
+let filters = { search:"", category:"All", newOnly:false };
 
 // Fetch products from Google Sheet
 Papa.parse(SHEET_CSV_URL, {
@@ -102,65 +101,63 @@ Papa.parse(SHEET_CSV_URL, {
   }
 });
 
-// Render products with fade-in/out
+// Render products
 function render(){
   const grid = document.getElementById('grid');
+  grid.innerHTML = "";
+  let list = products.slice();
+
+  const q = filters.search.toLowerCase();
+  if(q) list = list.filter(p => p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
   
-  Array.from(grid.children).forEach(card => {
-    const tag = card.querySelector(".tag");
-    if(tag) tag.classList.remove("visible");
-    card.style.opacity = "0";
-  });
+  if(filters.category !== "All") list = list.filter(p => p.Category === filters.category);
+  if(filters.newOnly) list = list.filter(p => p.Tag.toLowerCase() === "new");
 
-  setTimeout(() => {
-    grid.innerHTML = "";
-    let list = products.slice();
-    
-    const q = filters.search.toLowerCase();
-    if(q) list = list.filter(p => p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
-    if(filters.category !== "All") list = list.filter(p => p.Category === filters.category);
-    if(filters.new) list = list.filter(p => p.Tag === "new");
-    
-    list.forEach(p => {
-      const c = document.createElement("div");
-      c.className = "card";
-      c.style.opacity = "0";
-      c.innerHTML = `
-        <img src="${p.Image}" alt="${p.Name}">
-        <div class="body">
-          <div style="font-weight:800">${p.Name}</div>
-          <div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div>
-          <div style="display:flex;gap:6px;margin-top:6px;">
-            ${p.Tag === "new" ? '<span class="tag new">NEW</span>' : ''}
-          </div>
-          <button onclick='openModal(${JSON.stringify(p)})'>View</button>
+  list.forEach(p=>{
+    const c = document.createElement("div");
+    c.className="card";
+    c.innerHTML=`
+      <img src="${p.Image}" alt="${p.Name}">
+      <div class="body">
+        <div style="font-weight:800">${p.Name}</div>
+        <div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          ${p.Tag.toLowerCase()==="new"?'<span class="tag new">NEW</span>':''}
         </div>
-      `;
-      grid.appendChild(c);
-
-      const tag = c.querySelector(".tag");
-      if(tag) setTimeout(() => tag.classList.add("visible"), 50);
-      setTimeout(() => c.style.opacity = "1", 50);
-    });
-  }, 300);
+        <button onclick='openModal(${JSON.stringify(p)})'>View</button>
+      </div>
+    `;
+    grid.appendChild(c);
+  });
 }
 
-// Filters
-document.querySelectorAll('.filters button[data-cat]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filters button[data-cat]').forEach(b => b.classList.remove('active'));
+// Category buttons
+document.querySelectorAll('.filters button[data-cat]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.filters button[data-cat]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     filters.category = btn.dataset.cat;
+    filters.newOnly = false; // reset new filter when selecting category
+    document.getElementById('newBtn').classList.remove('active');
     render();
   });
 });
 
-document.getElementById('newBtn').addEventListener('click', () => {
-  filters.new = !filters.new;
+// NEW button
+document.getElementById('newBtn').addEventListener('click', ()=>{
+  filters.newOnly = !filters.newOnly;
+  document.getElementById('newBtn').classList.toggle('active', filters.newOnly);
+
+  if(filters.newOnly){
+    filters.category = "All";
+    document.querySelectorAll('.filters button[data-cat]').forEach(b=>b.classList.remove('active'));
+    document.querySelector('button[data-cat="All"]').classList.add('active');
+  }
   render();
 });
 
-function applyFilters(){filters.search=document.getElementById('search').value; render();}
+// Search
+function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
 
 // Modal
 function openModal(p){
