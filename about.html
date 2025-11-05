@@ -10,16 +10,27 @@ body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .nav .brand{font-weight:800;font-size:1.2rem;}
 .nav .menu{display:flex;gap:16px;position:relative;}
 .nav .menu > .dropdown{position:relative;}
-.nav .menu button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;}
-.nav .menu button.active{background:#047857;color:#fff;}
-.nav .submenu{position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;display:none;flex-direction:column;box-shadow:0 4px 8px rgba(0,0,0,0.1);}
-.nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;}
-.nav .dropdown:hover .submenu{display:flex;}
+.nav .menu button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;transition:0.2s;}
+.nav .menu button:hover, .nav .menu button.active{background:#047857;color:#fff;}
+.nav .submenu{position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;display:flex;flex-direction:column;
+  box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:5;
+  opacity:0;pointer-events:none;transform:translateY(5px);
+  transition:opacity 0.25s ease, transform 0.25s ease;
+}
+.dropdown.open .submenu{
+  opacity:1;pointer-events:auto;transform:translateY(0);
+}
+.nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;transition:0.2s;}
+.nav .submenu button:hover, .nav .submenu button.active{background:#10b981;color:#fff;}
 .nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
 main { max-width: 900px; margin: 40px auto; padding: 0 20px; }
 h2 { color:#047857; margin-top:24px; }
 p { line-height:1.6; margin-bottom:16px; }
 footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;color:#666;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-top:20px;}
+.card{background:#fff;border-radius:12px;box-shadow:0 2px 5px rgba(0,0,0,0.1);padding:10px;text-align:center;}
+.card img{width:100%;border-radius:8px;height:150px;object-fit:contain;}
+.brandline{display:flex;justify-content:space-between;font-size:0.9rem;color:#555;}
 </style>
 </head>
 <body>
@@ -29,59 +40,144 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
   <div class="menu">
     <a href="index.html"><button>All</button></a>
     <div class="dropdown">
-      <button>Yonex</button>
+      <button class="dropdown-toggle">Yonex</button>
       <div class="submenu">
-        <button>Racket</button>
-        <button>Shoes</button>
-        <button>Strings</button>
-        <button>Bag</button>
-        <button>Accessories</button>
+        <button data-brand="Yonex" data-cat="Racket">Racket</button>
+        <button data-brand="Yonex" data-cat="Shoes">Shoes</button>
+        <button data-brand="Yonex" data-cat="Strings">Strings</button>
+        <button data-brand="Yonex" data-cat="Bag">Bag</button>
+        <button data-brand="Yonex" data-cat="Accessories">Accessories</button>
       </div>
     </div>
     <div class="dropdown">
-      <button>Li-Ning</button>
+      <button class="dropdown-toggle">Li-Ning</button>
       <div class="submenu">
-        <button>Racket</button>
-        <button>Shoes</button>
-        <button>Strings</button>
-        <button>Bag</button>
-        <button>Accessories</button>
+        <button data-brand="Li-Ning" data-cat="Racket">Racket</button>
+        <button data-brand="Li-Ning" data-cat="Shoes">Shoes</button>
+        <button data-brand="Li-Ning" data-cat="Strings">Strings</button>
+        <button data-brand="Li-Ning" data-cat="Bag">Bag</button>
+        <button data-brand="Li-Ning" data-cat="Accessories">Accessories</button>
       </div>
     </div>
     <div class="dropdown">
-      <button>Victor</button>
+      <button class="dropdown-toggle">Victor</button>
       <div class="submenu">
-        <button>Racket</button>
-        <button>Shoes</button>
-        <button>Strings</button>
-        <button>Bag</button>
-        <button>Accessories</button>
+        <button data-brand="Victor" data-cat="Racket">Racket</button>
+        <button data-brand="Victor" data-cat="Shoes">Shoes</button>
+        <button data-brand="Victor" data-cat="Strings">Strings</button>
+        <button data-brand="Victor" data-cat="Bag">Bag</button>
+        <button data-brand="Victor" data-cat="Accessories">Accessories</button>
       </div>
     </div>
     <a href="about.html"><button class="active">About Us</button></a>
     <button id="locationBtn">Location</button>
   </div>
-  <input type="text" id="search" placeholder="Search..." disabled>
+  <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
 </header>
 
 <main>
   <h2>Welcome to SmashHub!</h2>
-  <p>This is a placeholder page for the “About Us” section. Here you can introduce your store, its mission, and what makes it unique.</p>
+  <p>This is a placeholder for your “About Us” page. You can later describe your shop, story, and values here.</p>
   
   <h2>Our Mission</h2>
-  <p>SmashHub is dedicated to providing high-quality badminton gear for players of all levels. From rackets and shoes to bags and accessories, we aim to make your badminton experience better and more enjoyable.</p>
-  
-  <h2>Contact Us</h2>
-  <p>If you have questions or would like to place an order, you can reach us via email at <a href="mailto:sales@smashhub.example">sales@smashhub.example</a>.</p>
+  <p>SmashHub is dedicated to bringing the best badminton gear to every player — from beginners to pros. We offer rackets, bags, shoes, and accessories from top brands.</p>
+
+  <h2>Preview of Products</h2>
+  <div class="grid" id="grid"></div>
 </main>
 
 <footer>
   © <span id="year"></span> SmashHub
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
-</script>
 
+const SHEET_URLS = [
+  { brand: "Yonex", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=0&single=true&output=csv" },
+  { brand: "Li-Ning", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1964036999&single=true&output=csv" },
+  { brand: "Victor", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1101170186&single=true&output=csv" }
+];
+
+let products = [];
+let filters = { search:"", brand:null, category:null };
+
+function fetchAllSheets() {
+  let loaded = 0;
+  SHEET_URLS.forEach(sheet => {
+    Papa.parse(sheet.url, {
+      download: true,
+      header: true,
+      complete: function(results){
+        const sheetProducts = results.data
+          .filter(p => p.Name)
+          .map(p => ({
+            Name: p.Name,
+            Brand: sheet.brand,
+            Category: p.Category || "Accessories",
+            Price: parseFloat(p.Price) || 0,
+            Image: p.Image || "",
+            Specs: p.Specs || "",
+            Tag: p.Tag || ""
+          }));
+        products = products.concat(sheetProducts);
+        loaded++;
+        if(loaded === SHEET_URLS.length) render();
+      }
+    });
+  });
+}
+fetchAllSheets();
+
+function render(){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = "";
+  let list = products.slice();
+
+  if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()) || p.Brand.toLowerCase().includes(filters.search.toLowerCase()));
+  if(filters.brand) list = list.filter(p => p.Brand === filters.brand);
+  if(filters.category) list = list.filter(p => p.Category === filters.category);
+
+  list.forEach(p=>{
+    const c = document.createElement("div"); c.className="card";
+    c.innerHTML=`
+      <img src="${p.Image}" alt="${p.Name}">
+      <div class="body">
+        <div style="font-weight:800">${p.Name}</div>
+        <div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div>
+      </div>
+    `;
+    grid.appendChild(c);
+  });
+}
+
+document.querySelectorAll('.submenu button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.submenu button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filters.brand = btn.dataset.brand;
+    filters.category = btn.dataset.cat;
+    render();
+  });
+});
+
+function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
+
+// Dropdown click-to-open
+document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dropdown = toggle.parentElement;
+    const isOpen = dropdown.classList.contains('open');
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+    if (!isOpen) dropdown.classList.add('open');
+  });
+});
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+});
+</script>
 </body>
 </html>
