@@ -1,101 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Badminton Store</title>
-  <link rel="stylesheet" href="assets/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmashHub - Badminton Gear</title>
   <style>
-    /* Dropdown hover highlight */
-    nav ul ul li a:hover {
-      background-color: #f0f0f0;
-      color: #000;
-      font-weight: 600;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f9faf9;
+      color: #111;
     }
 
-    /* Search bar style */
-    .search-container {
-      position: relative;
-      display: inline-block;
-    }
-
-    #search {
-      padding: 8px;
-      width: 250px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .search-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100%;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-top: none;
+    /* NAVIGATION */
+    header {
+      background: linear-gradient(90deg, #047857, #10b981);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
       z-index: 1000;
-      display: none;
     }
 
-    .search-dropdown div {
-      padding: 8px;
+    .brand {
+      font-weight: 800;
+      font-size: 1.4rem;
       cursor: pointer;
     }
 
-    .search-dropdown div:hover {
-      background-color: #f2f2f2;
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
     }
 
-    .highlight {
-      font-weight: bold;
-      color: #007bff;
+    nav a, nav button {
+      background: white;
+      color: #047857;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: none;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    nav a:hover, nav button:hover {
+      background: #047857;
+      color: white;
+    }
+
+    /* DROPDOWN */
+    .dropdown {
+      position: relative;
+    }
+
+    .submenu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      color: #047857;
+      min-width: 140px;
+      border-radius: 8px;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .dropdown:hover .submenu {
+      display: flex;
+    }
+
+    .submenu button {
+      border: none;
+      background: transparent;
+      padding: 8px 12px;
+      text-align: left;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .submenu button:hover {
+      background: #047857;
+      color: white;
+    }
+
+    /* SEARCH BAR */
+    .search-container {
+      margin-left: auto;
+    }
+
+    #search {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 999px;
+      width: 200px;
+    }
+
+    /* GRID */
+    main {
+      max-width: 1100px;
+      margin: 20px auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card .body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card .brandline {
+      display: flex;
+      justify-content: space-between;
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      background: #fff;
+      border-top: 1px solid #eee;
+      padding: 14px;
+      text-align: center;
+      color: #666;
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Badminton Store</h1>
-    <nav>
-      <ul>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="#" onclick="showAll()">All</a></li>
-        <li><a href="#">Yonex</a>
-          <ul>
-            <li><a href="#" onclick="filterItems('Yonex', 'Racket')">Racket</a></li>
-            <li><a href="#" onclick="filterItems('Yonex', 'Bag')">Bag</a></li>
-            <li><a href="#" onclick="filterItems('Yonex', 'Shoes')">Shoes</a></li>
-            <li><a href="#" onclick="filterItems('Yonex', 'Accessories')">Accessories</a></li>
-          </ul>
-        </li>
-        <li><a href="#">Li-Ning</a>
-          <ul>
-            <li><a href="#" onclick="filterItems('Li-Ning', 'Racket')">Racket</a></li>
-            <li><a href="#" onclick="filterItems('Li-Ning', 'Bag')">Bag</a></li>
-            <li><a href="#" onclick="filterItems('Li-Ning', 'Shoes')">Shoes</a></li>
-            <li><a href="#" onclick="filterItems('Li-Ning', 'Accessories')">Accessories</a></li>
-          </ul>
-        </li>
-        <li><a href="#">Victor</a>
-          <ul>
-            <li><a href="#" onclick="filterItems('Victor', 'Racket')">Racket</a></li>
-            <li><a href="#" onclick="filterItems('Victor', 'Bag')">Bag</a></li>
-            <li><a href="#" onclick="filterItems('Victor', 'Shoes')">Shoes</a></li>
-            <li><a href="#" onclick="filterItems('Victor', 'Accessories')">Accessories</a></li>
-          </ul>
-        </li>
-        <li><a href="location.html">Location</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <div class="search-container">
-    <input type="text" id="search" placeholder="Search items..." oninput="showSearchSuggestions()">
-    <div class="search-dropdown" id="searchDropdown"></div>
-  </div>
+<header>
+  <div class="brand">SmashHub</div>
+  <nav>
+    <a href="about.html">About Us</a>
+    <button id="allBtn">All</button>
 
-  <section id="items"></section>
+    <div class="dropdown">
+      <button>Yonex</button>
+      <div class="submenu">
+        <button data-brand="Yonex" data-cat="Racket">Racket</button>
+        <button data-brand="Yonex" data-cat="Bag">Bag</button>
+        <button data-brand="Yonex" data-cat="Shoes">Shoes</button>
+        <button data-brand="Yonex" data-cat="Accessories">Accessories</button>
+      </div>
+    </div>
 
-  <script src="assets/script.js"></script>
+    <div class="dropdown">
+      <button>Li-Ning</button>
+      <div class="submenu">
+        <button data-brand="Li-Ning" data-cat="Racket">Racket</button>
+        <button data-brand="Li-Ning" data-cat="Bag">Bag</button>
+        <button data-brand="Li-Ning" data-cat="Shoes">Shoes</button>
+        <button data-brand="Li-Ning" data-cat="Accessories">Accessories</button>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button>Victor</button>
+      <div class="submenu">
+        <button data-brand="Victor" data-cat="Racket">Racket</button>
+        <button data-brand="Victor" data-cat="Bag">Bag</button>
+        <button data-brand="Victor" data-cat="Shoes">Shoes</button>
+        <button data-brand="Victor" data-cat="Accessories">Accessories</button>
+      </div>
+    </div>
+
+    <button id="locationBtn">Location</button>
+    <div class="search-container">
+      <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
+    </div>
+  </nav>
+</header>
+
+<main id="grid"></main>
+
+<footer>© <span id="year"></span> SmashHub — All Rights Reserved</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="assets/script.js"></script>
+
 </body>
 </html>
