@@ -29,14 +29,6 @@ body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .card .body{padding:12px;display:flex;flex-direction:column;gap:8px;}
 .card .brandline{display:flex;justify-content:space-between;color:#555;font-size:0.9rem;}
 .card button{padding:8px;border:none;border-radius:8px;background:#047857;color:#fff;font-weight:700;cursor:pointer;}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:20px;}
-.modal{max-width:700px;width:100%;background:#fff;border-radius:12px;overflow:hidden;}
-.modal .content{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;}
-.modal img{width:100%;height:100%;object-fit:cover;border-radius:8px;}
-.modal .meta{display:flex;flex-direction:column;gap:8px;}
-.modal .meta input, .modal .meta textarea, .modal .meta select{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;}
-.modal .buttons{display:flex;gap:8px;margin-top:10px;}
-.modal .close{margin-left:auto;padding:6px;border:none;background:#eee;border-radius:8px;cursor:pointer;}
 footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;color:#666;}
 @media(max-width:700px){.modal .content{grid-template-columns:1fr;}}
 </style>
@@ -46,7 +38,8 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <header class="nav">
   <div class="brand">SmashHub</div>
   <div class="menu">
-    <a href="index.html"><button>All</button></a>
+    <a href="about.html"><button>About Us</button></a>
+    <a href="index.html"><button id="allBtn">All</button></a>
     <div class="dropdown">
       <button class="dropdown-toggle">Yonex</button>
       <div class="submenu">
@@ -77,54 +70,12 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
         <button data-brand="Victor" data-cat="Accessories">Accessories</button>
       </div>
     </div>
-    <a href="about.html"><button>About Us</button></a>
     <button id="locationBtn">Location</button>
   </div>
   <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
 </header>
 
 <main class="grid" id="grid"></main>
-
-<div class="modal-backdrop" id="modalBack" onclick="closeModal(event)">
-  <div class="modal">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #eee">
-      <strong>Product Details</strong>
-      <button class="close" onclick="closeModal(true)">✕</button>
-    </div>
-    <div class="content">
-      <img id="mimg" src="" alt="">
-      <div class="meta">
-        <label>Name</label><input id="mname" type="text">
-        <label>Brand</label>
-        <select id="mbrand">
-          <option>Yonex</option>
-          <option>Li-Ning</option>
-          <option>Victor</option>
-        </select>
-        <label>Category</label>
-        <select id="mcat">
-          <option>Racket</option>
-          <option>Shoes</option>
-          <option>Strings</option>
-          <option>Bag</option>
-          <option>Accessories</option>
-        </select>
-        <label>Price</label><input id="mprice" type="number">
-        <label>Specs</label><textarea id="mspecs" rows="4"></textarea>
-        <label>Tag</label>
-        <select id="mtag">
-          <option></option>
-          <option>new</option>
-          <option>sale</option>
-        </select>
-        <div class="buttons">
-          <button id="saveBtn">Save</button>
-          <button onclick="closeModal(true)">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <footer>© <span id="year"></span> SmashHub — No cart, order via email</footer>
 
@@ -140,7 +91,6 @@ const SHEET_URLS = [
 
 let products = [];
 let filters = { search:"", brand:null, category:null };
-let currentEdit = null;
 
 function fetchAllSheets() {
   let loaded = 0;
@@ -167,24 +117,25 @@ function fetchAllSheets() {
     });
   });
 }
+
 fetchAllSheets();
 
 function render(){
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
   let list = products.slice();
+
   if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()) || p.Brand.toLowerCase().includes(filters.search.toLowerCase()));
   if(filters.brand) list = list.filter(p => p.Brand === filters.brand);
   if(filters.category) list = list.filter(p => p.Category === filters.category);
 
-  list.forEach((p, i)=>{
+  list.forEach(p=>{
     const c = document.createElement("div"); c.className="card";
     c.innerHTML=`
       <img src="${p.Image}" alt="${p.Name}">
       <div class="body">
         <div style="font-weight:800">${p.Name}</div>
         <div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div>
-        <button onclick='openModal(${i})'>View & Edit</button>
       </div>
     `;
     grid.appendChild(c);
@@ -193,54 +144,34 @@ function render(){
 
 document.querySelectorAll('.submenu button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.submenu button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
     filters.brand = btn.dataset.brand;
     filters.category = btn.dataset.cat;
     render();
   });
 });
-function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
 
-function openModal(index){
-  currentEdit = index;
-  const p = products[index];
-  document.getElementById('modalBack').style.display="flex";
-  document.getElementById('mimg').src=p.Image;
-  document.getElementById('mname').value=p.Name;
-  document.getElementById('mbrand').value=p.Brand;
-  document.getElementById('mcat').value=p.Category;
-  document.getElementById('mprice').value=p.Price;
-  document.getElementById('mspecs').value=p.Specs;
-  document.getElementById('mtag').value=p.Tag;
-}
-
-document.getElementById('saveBtn').addEventListener('click', ()=>{
-  if(currentEdit !== null){
-    const p = products[currentEdit];
-    p.Name = document.getElementById('mname').value;
-    p.Brand = document.getElementById('mbrand').value;
-    p.Category = document.getElementById('mcat').value;
-    p.Price = parseFloat(document.getElementById('mprice').value) || 0;
-    p.Specs = document.getElementById('mspecs').value;
-    p.Tag = document.getElementById('mtag').value;
-    render();
-    closeModal(true);
-  }
+document.getElementById('allBtn').addEventListener('click', ()=>{
+  filters.brand = null; filters.category = null; render();
 });
 
-function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
+function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
 
-// Dropdown toggle
+// Dropdown click-to-open
 document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-  toggle.addEventListener('click', (e)=>{
+  toggle.addEventListener('click', (e) => {
     e.stopPropagation();
     const dropdown = toggle.parentElement;
     const isOpen = dropdown.classList.contains('open');
     document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
-    if(!isOpen) dropdown.classList.add('open');
+    if (!isOpen) dropdown.classList.add('open');
   });
 });
-document.addEventListener('click', ()=>{document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));});
-</script>
 
+document.addEventListener('click', () => {
+  document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+});
+</script>
 </body>
 </html>
