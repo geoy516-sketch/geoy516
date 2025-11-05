@@ -72,13 +72,12 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Your published Google Sheet CSV link
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?output=csv";
 
 let products = [];
 let filters = { search:"", category:"All", new:false };
 
-// Fetch products from Google Sheet
+// Fetch products
 Papa.parse(SHEET_CSV_URL, {
   download: true,
   header: true,
@@ -90,7 +89,7 @@ Papa.parse(SHEET_CSV_URL, {
       Price: parseFloat(p.Price) || 0,
       Image: p.Image || "",
       Specs: p.Specs || "",
-      Tag: p.Tag || ""
+      Tag: (p.Tag || "").trim().toLowerCase() // normalize
     }));
     render();
   },
@@ -100,19 +99,20 @@ Papa.parse(SHEET_CSV_URL, {
   }
 });
 
-// Render products
+// Render products with combined filters
 function render(){
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
   let list = products.slice();
 
   const q = filters.search.toLowerCase();
-  if(q) list = list.filter(p=>p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
-  if(filters.category!=="All") list = list.filter(p=>p.Category===filters.category);
-  if(filters.new) list = list.filter(p=>p.Tag==="new");
+  if(q) list = list.filter(p => p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
+  if(filters.category!=="All") list = list.filter(p => p.Category === filters.category);
+  if(filters.new) list = list.filter(p => p.Tag === "new");
 
   list.forEach(p=>{
-    const c = document.createElement("div"); c.className="card";
+    const c = document.createElement("div"); 
+    c.className="card";
     c.innerHTML=`
       <img src="${p.Image}" alt="${p.Name}">
       <div class="body">
@@ -126,7 +126,7 @@ function render(){
   });
 }
 
-// Filters
+// Category filter
 document.querySelectorAll('.filters button[data-cat]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.filters button[data-cat]').forEach(b=>b.classList.remove('active'));
@@ -136,10 +136,19 @@ document.querySelectorAll('.filters button[data-cat]').forEach(btn=>{
   });
 });
 
-document.getElementById('newBtn').addEventListener('click', ()=>{filters.new=!filters.new; render();});
-function applyFilters(){filters.search=document.getElementById('search').value; render();}
+// New filter
+document.getElementById('newBtn').addEventListener('click', ()=>{
+  filters.new = !filters.new;
+  render();
+});
 
-// Modal
+// Search filter
+function applyFilters(){
+  filters.search = document.getElementById('search').value;
+  render();
+}
+
+// Modal functions
 function openModal(p){
   document.getElementById('modalBack').style.display="flex";
   document.getElementById('mtitle').textContent=p.Name;
@@ -151,8 +160,16 @@ function openModal(p){
   document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
   document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
 }
-function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
-function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
+
+function closeModal(e){
+  if(e===true || e.target.id==='modalBack'){
+    document.getElementById('modalBack').style.display="none";
+  }
+}
+
+function orderText(p){
+  return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;
+}
 </script>
 </body>
 </html>
