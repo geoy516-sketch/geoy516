@@ -1,208 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmashHub - Badminton Gear</title>
-<style>
-body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
-.nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
-.nav .brand{font-weight:800;font-size:1.2rem;}
-.nav .menu{display:flex;gap:16px;position:relative;}
-.nav .menu > .dropdown{position:relative;}
-.nav .menu button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;}
-.nav .menu button.active{background:#047857;color:#fff;}
-.nav .submenu{position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;display:none;flex-direction:column;box-shadow:0 4px 8px rgba(0,0,0,0.1);}
-.nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;}
-.nav .dropdown:hover .submenu{display:flex;}
-.nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
-.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
-.card img{width:100%;height:200px;object-fit:cover;}
-.card .body{padding:12px;display:flex;flex-direction:column;gap:8px;}
-.card .brandline{display:flex;justify-content:space-between;color:#555;font-size:0.9rem;}
-.card button{padding:8px;border:none;border-radius:8px;background:#047857;color:#fff;font-weight:700;cursor:pointer;}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:20px;}
-.modal{max-width:700px;width:100%;background:#fff;border-radius:12px;overflow:hidden;}
-.modal .content{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;}
-.modal img{width:100%;height:100%;object-fit:cover;border-radius:8px;}
-.modal .meta{display:flex;flex-direction:column;gap:8px;}
-.modal .close{margin-left:auto;padding:6px;border:none;background:#eee;border-radius:8px;cursor:pointer;}
-footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;color:#666;}
-@media(max-width:700px){.modal .content{grid-template-columns:1fr;}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Badminton Store</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    /* Dropdown hover highlight */
+    nav ul ul li a:hover {
+      background-color: #f0f0f0;
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* Search bar style */
+    .search-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    #search {
+      padding: 8px;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .search-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-top: none;
+      z-index: 1000;
+      display: none;
+    }
+
+    .search-dropdown div {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .search-dropdown div:hover {
+      background-color: #f2f2f2;
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>Badminton Store</h1>
+    <nav>
+      <ul>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="#" onclick="showAll()">All</a></li>
+        <li><a href="#">Yonex</a>
+          <ul>
+            <li><a href="#" onclick="filterItems('Yonex', 'Racket')">Racket</a></li>
+            <li><a href="#" onclick="filterItems('Yonex', 'Bag')">Bag</a></li>
+            <li><a href="#" onclick="filterItems('Yonex', 'Shoes')">Shoes</a></li>
+            <li><a href="#" onclick="filterItems('Yonex', 'Accessories')">Accessories</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Li-Ning</a>
+          <ul>
+            <li><a href="#" onclick="filterItems('Li-Ning', 'Racket')">Racket</a></li>
+            <li><a href="#" onclick="filterItems('Li-Ning', 'Bag')">Bag</a></li>
+            <li><a href="#" onclick="filterItems('Li-Ning', 'Shoes')">Shoes</a></li>
+            <li><a href="#" onclick="filterItems('Li-Ning', 'Accessories')">Accessories</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Victor</a>
+          <ul>
+            <li><a href="#" onclick="filterItems('Victor', 'Racket')">Racket</a></li>
+            <li><a href="#" onclick="filterItems('Victor', 'Bag')">Bag</a></li>
+            <li><a href="#" onclick="filterItems('Victor', 'Shoes')">Shoes</a></li>
+            <li><a href="#" onclick="filterItems('Victor', 'Accessories')">Accessories</a></li>
+          </ul>
+        </li>
+        <li><a href="location.html">Location</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<header class="nav">
-  <div class="brand">SmashHub</div>
-  <div class="menu">
-    <!-- About Us -->
-    <button id="aboutBtn" onclick="window.location.href='about.html'">About Us</button>
-    
-    <!-- All -->
-    <button id="allBtn">All</button>
-    
-    <!-- Yonex -->
-    <div class="dropdown">
-      <button>Yonex</button>
-      <div class="submenu">
-        <button data-brand="Yonex" data-cat="Racket">Racket</button>
-        <button data-brand="Yonex" data-cat="Shoes">Shoes</button>
-        <button data-brand="Yonex" data-cat="Strings">Strings</button>
-        <button data-brand="Yonex" data-cat="Bag">Bag</button>
-        <button data-brand="Yonex" data-cat="Accessories">Accessories</button>
-      </div>
-    </div>
-    
-    <!-- Li-Ning -->
-    <div class="dropdown">
-      <button>Li-Ning</button>
-      <div class="submenu">
-        <button data-brand="Li-Ning" data-cat="Racket">Racket</button>
-        <button data-brand="Li-Ning" data-cat="Shoes">Shoes</button>
-        <button data-brand="Li-Ning" data-cat="Strings">Strings</button>
-        <button data-brand="Li-Ning" data-cat="Bag">Bag</button>
-        <button data-brand="Li-Ning" data-cat="Accessories">Accessories</button>
-      </div>
-    </div>
-    
-    <!-- Victor -->
-    <div class="dropdown">
-      <button>Victor</button>
-      <div class="submenu">
-        <button data-brand="Victor" data-cat="Racket">Racket</button>
-        <button data-brand="Victor" data-cat="Shoes">Shoes</button>
-        <button data-brand="Victor" data-cat="Strings">Strings</button>
-        <button data-brand="Victor" data-cat="Bag">Bag</button>
-        <button data-brand="Victor" data-cat="Accessories">Accessories</button>
-      </div>
-    </div>
-    
-    <!-- Location -->
-    <button id="locationBtn">Location</button>
+  <div class="search-container">
+    <input type="text" id="search" placeholder="Search items..." oninput="showSearchSuggestions()">
+    <div class="search-dropdown" id="searchDropdown"></div>
   </div>
-  <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
-</header>
 
-<main class="grid" id="grid"></main>
+  <section id="items"></section>
 
-<div class="modal-backdrop" id="modalBack" onclick="closeModal(event)">
-  <div class="modal">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #eee">
-      <strong id="mtitle">Product</strong>
-      <button class="close" onclick="closeModal(true)">✕</button>
-    </div>
-    <div class="content">
-      <img id="mimg" src="" alt="">
-      <div class="meta">
-        <div id="mname" style="font-weight:800"></div>
-        <div class="brandline"><span id="mbrand"></span><span id="mprice"></span></div>
-        <div id="mspecs" style="color:#555;"></div>
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          <button id="copyBtn">Copy Order Text</button>
-          <a id="mailto" target="_blank" style="padding:8px;border:1px solid #ddd;border-radius:8px;text-decoration:none;color:#555;">Email to Order</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<footer>© <span id="year"></span> SmashHub — No cart, order via email</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script>
-document.getElementById('year').textContent = new Date().getFullYear();
-
-// CSV links per brand
-const SHEET_URLS = [
-  { brand: "Yonex", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=0&single=true&output=csv" },
-  { brand: "Li-Ning", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1964036999&single=true&output=csv" },
-  { brand: "Victor", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1101170186&single=true&output=csv" }
-];
-
-let products = [];
-let filters = { search:"", brand:null, category:null };
-
-// Fetch all sheets
-function fetchAllSheets() {
-  let loaded = 0;
-  SHEET_URLS.forEach(sheet => {
-    Papa.parse(sheet.url, {
-      download: true,
-      header: true,
-      complete: function(results){
-        const sheetProducts = results.data
-          .filter(p => p.Name)
-          .map(p => ({
-            Name: p.Name,
-            Brand: sheet.brand,
-            Category: p.Category || "Accessories",
-            Price: parseFloat(p.Price) || 0,
-            Image: p.Image || "",
-            Specs: p.Specs || "",
-            Tag: p.Tag || ""
-          }));
-        products = products.concat(sheetProducts);
-        loaded++;
-        if(loaded === SHEET_URLS.length) render();
-      }
-    });
-  });
-}
-
-fetchAllSheets();
-
-// Render products
-function render(){
-  const grid = document.getElementById('grid');
-  grid.innerHTML = "";
-  let list = products.slice();
-
-  if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()) || p.Brand.toLowerCase().includes(filters.search.toLowerCase()));
-  if(filters.brand) list = list.filter(p => p.Brand === filters.brand);
-  if(filters.category) list = list.filter(p => p.Category === filters.category);
-
-  list.forEach(p=>{
-    const c = document.createElement("div"); c.className="card";
-    c.innerHTML=`
-      <img src="${p.Image}" alt="${p.Name}">
-      <div class="body">
-        <div style="font-weight:800">${p.Name}</div>
-        <div class="brandline"><span>${p.Brand}</span><span>$${p.Price.toFixed(2)}</span></div>
-        <button onclick='openModal(${JSON.stringify(p)})'>View</button>
-      </div>
-    `;
-    grid.appendChild(c);
-  });
-}
-
-// Navigation buttons
-document.querySelectorAll('.submenu button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    filters.brand = btn.dataset.brand;
-    filters.category = btn.dataset.cat;
-    render();
-  });
-});
-document.getElementById('allBtn').addEventListener('click', ()=>{ filters.brand = null; filters.category = null; render(); });
-function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
-
-// Modal
-function openModal(p){
-  document.getElementById('modalBack').style.display="flex";
-  document.getElementById('mtitle').textContent=p.Name;
-  document.getElementById('mimg').src=p.Image;
-  document.getElementById('mname').textContent=p.Name;
-  document.getElementById('mbrand').textContent=p.Brand+" · "+p.Category;
-  document.getElementById('mprice').textContent="$"+p.Price.toFixed(2);
-  document.getElementById('mspecs').textContent=p.Specs;
-  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));};
-  document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
-}
-function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
-function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
-</script>
-
+  <script src="assets/script.js"></script>
 </body>
 </html>
