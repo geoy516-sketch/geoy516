@@ -6,14 +6,15 @@
 <title>SmashHub - Badminton Gear</title>
 <style>
 body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
-.nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
+.nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;flex-wrap:wrap;}
 .nav .brand{font-weight:800;font-size:1.2rem;}
-.nav .menu{display:flex;gap:16px;position:relative;}
+.nav .menu{display:flex;gap:16px;position:relative;align-items:center;}
 .nav .menu > .dropdown{position:relative;}
-.nav .menu button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;}
-.nav .menu button.active{background:#047857;color:#fff;}
-.nav .submenu{display:none;position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;flex-direction:column;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:5;}
+.nav .menu button, .nav .menu a.nav-link{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;text-decoration:none;}
+.nav .menu button.active, .nav .menu a.nav-link.active{background:#047857;color:#fff;}
+.nav .submenu{position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;display:none;flex-direction:column;box-shadow:0 4px 8px rgba(0,0,0,0.1);}
 .nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;}
+.nav .dropdown:hover .submenu{display:flex;}
 .nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
@@ -36,7 +37,9 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <header class="nav">
   <div class="brand">SmashHub</div>
   <div class="menu">
+    <a href="about.html" class="nav-link">About Us</a>
     <button id="allBtn">All</button>
+
     <div class="dropdown">
       <button>Yonex</button>
       <div class="submenu">
@@ -47,6 +50,7 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
         <button data-brand="Yonex" data-cat="Accessories">Accessories</button>
       </div>
     </div>
+
     <div class="dropdown">
       <button>Li-Ning</button>
       <div class="submenu">
@@ -57,6 +61,7 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
         <button data-brand="Li-Ning" data-cat="Accessories">Accessories</button>
       </div>
     </div>
+
     <div class="dropdown">
       <button>Victor</button>
       <div class="submenu">
@@ -67,6 +72,7 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
         <button data-brand="Victor" data-cat="Accessories">Accessories</button>
       </div>
     </div>
+
     <button id="locationBtn">Location</button>
   </div>
   <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
@@ -101,7 +107,6 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Google Sheet CSV links per brand
 const SHEET_URLS = [
   { brand: "Yonex", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=0&single=true&output=csv" },
   { brand: "Li-Ning", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1964036999&single=true&output=csv" },
@@ -111,7 +116,6 @@ const SHEET_URLS = [
 let products = [];
 let filters = { search:"", brand:null, category:null };
 
-// Fetch all sheets
 function fetchAllSheets() {
   let loaded = 0;
   SHEET_URLS.forEach(sheet => {
@@ -140,7 +144,6 @@ function fetchAllSheets() {
 
 fetchAllSheets();
 
-// Render products
 function render(){
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
@@ -164,23 +167,7 @@ function render(){
   });
 }
 
-// Dropdown menu click toggle
-document.querySelectorAll('.dropdown > button').forEach(btn=>{
-  btn.addEventListener('click', e=>{
-    const submenu = btn.nextElementSibling;
-    const isOpen = submenu.style.display === "flex";
-    document.querySelectorAll('.submenu').forEach(sm=>sm.style.display="none");
-    submenu.style.display = isOpen ? "none" : "flex";
-    e.stopPropagation();
-  });
-});
-
-// Close submenu if clicking outside
-document.addEventListener('click', ()=>{
-  document.querySelectorAll('.submenu').forEach(sm=>sm.style.display="none");
-});
-
-// Submenu buttons
+// Navigation buttons
 document.querySelectorAll('.submenu button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     filters.brand = btn.dataset.brand;
@@ -188,13 +175,7 @@ document.querySelectorAll('.submenu button').forEach(btn=>{
     render();
   });
 });
-
-// All button
-document.getElementById('allBtn').addEventListener('click', ()=>{
-  filters.brand = null; filters.category = null; render();
-});
-
-// Search
+document.getElementById('allBtn').addEventListener('click', ()=>{ filters.brand = null; filters.category = null; render(); });
 function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
 
 // Modal
@@ -206,7 +187,7 @@ function openModal(p){
   document.getElementById('mbrand').textContent=p.Brand+" · "+p.Category;
   document.getElementById('mprice').textContent="$"+p.Price.toFixed(2);
   document.getElementById('mspecs').textContent=p.Specs;
-  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
+  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));};
   document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
 }
 function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
