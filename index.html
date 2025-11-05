@@ -7,36 +7,14 @@
 <style>
 body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
-.nav .brand{font-weight:800;font-size:1.2rem;}
-.nav .filters{display:flex;gap:10px;margin-left:20px;flex-wrap:wrap;}
-.nav .filters button{padding:6px 12px;border:none;border-radius:999px;background:#fff;color:#047857;font-weight:600;cursor:pointer;}
-.nav .filters button.active{background:#047857;color:#fff;}
-.nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
-
-/* Dropdown */
-.dropdown{position:relative;}
-.dropdown-content{
-  display:none;
-  position:absolute;
-  background:#fff;
-  min-width:120px;
-  box-shadow:0 4px 8px rgba(0,0,0,0.1);
-  border-radius:8px;
-  flex-direction:column;
-  margin-top:4px;
-  z-index:20;
-}
-.dropdown-content button{
-  padding:6px 12px;
-  text-align:left;
-  border:none;
-  background:none;
-  color:#047857;
-  cursor:pointer;
-}
-.dropdown:hover .dropdown-content{display:flex;}
-.dropdown-content button:hover{background:#f0fdf4;}
-
+.nav .brand{font-weight:800;font-size:1.2rem;cursor:pointer;}
+.nav .menu{display:flex;gap:20px;align-items:center;}
+.nav .menu-item{position:relative;cursor:pointer;}
+.nav .menu-item > span{padding:6px 12px;display:inline-block;}
+.nav .submenu{display:none;position:absolute;top:100%;left:0;background:#10b981;color:#fff;min-width:120px;border-radius:6px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+.nav .submenu div{padding:8px 12px;cursor:pointer;}
+.nav .submenu div:hover{background:#047857;}
+.nav .menu-item:hover .submenu{display:block;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
 .card img{width:100%;height:200px;object-fit:cover;}
@@ -57,21 +35,41 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 
 <header class="nav">
   <div class="brand">SmashHub</div>
-  <div class="filters">
-    <button data-cat="All" class="active">All</button>
+  <div class="menu">
+    <div class="menu-item" onclick="showAll()"><span>All</span></div>
     
-    <div class="dropdown">
-      <button>Badminton ▾</button>
-      <div class="dropdown-content">
-        <button data-sub="Yonex">Yonex</button>
-        <button data-sub="Li-Ning">Li-Ning</button>
-        <button data-sub="Victor">Victor</button>
+    <div class="menu-item"><span>Yonex</span>
+      <div class="submenu">
+        <div onclick="filterProducts('Yonex','Badminton')">Badminton</div>
+        <div onclick="filterProducts('Yonex','Shoes')">Shoes</div>
+        <div onclick="filterProducts('Yonex','Strings')">Strings</div>
+        <div onclick="filterProducts('Yonex','Bag')">Bag</div>
+        <div onclick="filterProducts('Yonex','Accessories')">Accessories</div>
       </div>
     </div>
-    
-    <button data-cat="Location">Location</button>
+
+    <div class="menu-item"><span>Li-Ning</span>
+      <div class="submenu">
+        <div onclick="filterProducts('Li-Ning','Badminton')">Badminton</div>
+        <div onclick="filterProducts('Li-Ning','Shoes')">Shoes</div>
+        <div onclick="filterProducts('Li-Ning','Strings')">Strings</div>
+        <div onclick="filterProducts('Li-Ning','Bag')">Bag</div>
+        <div onclick="filterProducts('Li-Ning','Accessories')">Accessories</div>
+      </div>
+    </div>
+
+    <div class="menu-item"><span>Victor</span>
+      <div class="submenu">
+        <div onclick="filterProducts('Victor','Badminton')">Badminton</div>
+        <div onclick="filterProducts('Victor','Shoes')">Shoes</div>
+        <div onclick="filterProducts('Victor','Strings')">Strings</div>
+        <div onclick="filterProducts('Victor','Bag')">Bag</div>
+        <div onclick="filterProducts('Victor','Accessories')">Accessories</div>
+      </div>
+    </div>
+
+    <div class="menu-item" onclick="showLocation()"><span>Location</span></div>
   </div>
-  <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
 </header>
 
 <main class="grid" id="grid"></main>
@@ -103,12 +101,13 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Example: Google Sheet CSV (can use multiple sheets per brand)
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?output=csv";
 
 let products = [];
-let filters = { search:"", category:"All", subcategory:"" };
+let filters = { brand:'', category:'' };
 
-// Fetch products from Google Sheet
+// Fetch products
 Papa.parse(SHEET_CSV_URL, {
   download: true,
   header: true,
@@ -116,38 +115,25 @@ Papa.parse(SHEET_CSV_URL, {
     products = results.data.filter(p => p.Name).map(p => ({
       Name: p.Name,
       Brand: p.Brand || "",
-      Category: p.Category || "Accessories",
+      Category: p.Category || "",
       Price: parseFloat(p.Price) || 0,
       Image: p.Image || "",
-      Specs: p.Specs || "",
-      Tag: p.Tag || ""
+      Specs: p.Specs || ""
     }));
-    render();
+    showAll();
   },
   error: function(err) {
-    alert("Error loading Google Sheet CSV");
     console.error(err);
+    alert("Error loading Google Sheet CSV");
   }
 });
 
-// Render products
-function render(){
+// Render
+function render(list){
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
-  let list = products.slice();
-
-  const q = filters.search.toLowerCase();
-  if(q) list = list.filter(p => p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
-
-  if(filters.category === "Badminton" && filters.subcategory) {
-    list = list.filter(p => p.Brand === filters.subcategory);
-  } else if(filters.category !== "All") {
-    list = list.filter(p => p.Category === filters.category);
-  }
-
   list.forEach(p=>{
-    const c = document.createElement("div");
-    c.className="card";
+    const c = document.createElement("div"); c.className="card";
     c.innerHTML=`
       <img src="${p.Image}" alt="${p.Name}">
       <div class="body">
@@ -160,29 +146,13 @@ function render(){
   });
 }
 
-// Category buttons
-document.querySelectorAll('.filters button[data-cat]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    filters.category = btn.dataset.cat;
-    filters.subcategory = "";
-    document.querySelectorAll('.filters button[data-cat]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    render();
-  });
-});
-
-// Subcategory buttons
-document.querySelectorAll('.dropdown-content button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    filters.subcategory = btn.dataset.sub;
-    filters.category = "Badminton";
-    document.querySelectorAll('.filters button[data-cat]').forEach(b=>b.classList.remove('active'));
-    document.querySelector('[data-cat="All"]').classList.add('active');
-    render();
-  });
-});
-
-function applyFilters(){filters.search=document.getElementById('search').value; render();}
+// Filters
+function filterProducts(brand, category){
+  const list = products.filter(p => p.Brand===brand && p.Category===category);
+  render(list);
+}
+function showAll(){render(products);}
+function showLocation(){alert("Show store locations here");}
 
 // Modal
 function openModal(p){
@@ -196,7 +166,6 @@ function openModal(p){
   document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
   document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
 }
-
 function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
 function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
 </script>
