@@ -6,14 +6,16 @@
 <title>SmashHub - Badminton Gear</title>
 <style>
 body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
-.nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:16px;}
-.nav .brand{font-weight:800;font-size:1.2rem;cursor:pointer;}
-.nav ul{list-style:none;padding:0;margin:0;display:flex;gap:20px;}
-.nav ul li{position:relative;}
-.nav ul li button{background:none;border:none;color:#fff;font-weight:600;font-size:1rem;cursor:pointer;padding:6px 12px;}
-.nav ul li ul{position:absolute;top:40px;left:0;background:#fff;color:#047857;display:none;flex-direction:column;min-width:120px;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.15);}
-.nav ul li ul li button{color:#047857;text-align:left;padding:8px;}
-.nav ul li:hover ul{display:flex;}
+.nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
+.nav .brand{font-weight:800;font-size:1.2rem;}
+.nav .menu{display:flex;gap:20px;}
+.nav .menu-item{position:relative;cursor:pointer;padding:6px 12px;border-radius:6px;}
+.nav .menu-item:hover{background:rgba(255,255,255,0.2);}
+.nav .submenu{display:none;position:absolute;top:36px;left:0;background:#fff;color:#047857;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.2);min-width:120px;flex-direction:column;z-index:20;}
+.nav .submenu div{padding:6px 12px;cursor:pointer;}
+.nav .submenu div:hover{background:#f0f0f0;}
+.nav .menu-item:hover .submenu{display:flex;flex-direction:column;}
+.nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
 .card img{width:100%;height:200px;object-fit:cover;}
@@ -33,51 +35,53 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <body>
 
 <header class="nav">
-  <div class="brand" onclick="showAll()">SmashHub</div>
-  <ul>
-    <li>
-      <button>Badminton</button>
-      <ul>
-        <li><button onclick="filterProducts('Yonex','Badminton')">Yonex</button></li>
-        <li><button onclick="filterProducts('Li-Ning','Badminton')">Li-Ning</button></li>
-        <li><button onclick="filterProducts('Victor','Badminton')">Victor</button></li>
-      </ul>
-    </li>
-    <li>
-      <button>Shoes</button>
-      <ul>
-        <li><button onclick="filterProducts('Yonex','Shoes')">Yonex</button></li>
-        <li><button onclick="filterProducts('Li-Ning','Shoes')">Li-Ning</button></li>
-        <li><button onclick="filterProducts('Victor','Shoes')">Victor</button></li>
-      </ul>
-    </li>
-    <li>
-      <button>Strings</button>
-      <ul>
-        <li><button onclick="filterProducts('Yonex','Strings')">Yonex</button></li>
-        <li><button onclick="filterProducts('Li-Ning','Strings')">Li-Ning</button></li>
-        <li><button onclick="filterProducts('Victor','Strings')">Victor</button></li>
-      </ul>
-    </li>
-    <li>
-      <button>Bag</button>
-      <ul>
-        <li><button onclick="filterProducts('Yonex','Bag')">Yonex</button></li>
-        <li><button onclick="filterProducts('Li-Ning','Bag')">Li-Ning</button></li>
-        <li><button onclick="filterProducts('Victor','Bag')">Victor</button></li>
-      </ul>
-    </li>
-    <li>
-      <button>Accessories</button>
-      <ul>
-        <li><button onclick="filterProducts('Yonex','Accessories')">Yonex</button></li>
-        <li><button onclick="filterProducts('Li-Ning','Accessories')">Li-Ning</button></li>
-        <li><button onclick="filterProducts('Victor','Accessories')">Victor</button></li>
-      </ul>
-    </li>
-    <li><button onclick="showAll()">All</button></li>
-    <li><button>Location</button></li>
-  </ul>
+  <div class="brand">SmashHub</div>
+  <div class="menu">
+    <div class="menu-item" onclick="applyCategory('All')">All</div>
+    
+    <div class="menu-item">Badminton
+      <div class="submenu">
+        <div onclick="applyBrand('Yonex')">Yonex</div>
+        <div onclick="applyBrand('Li-Ning')">Li-Ning</div>
+        <div onclick="applyBrand('Victor')">Victor</div>
+      </div>
+    </div>
+    
+    <div class="menu-item">Shoes
+      <div class="submenu">
+        <div onclick="applyBrand('Yonex')">Yonex</div>
+        <div onclick="applyBrand('Li-Ning')">Li-Ning</div>
+        <div onclick="applyBrand('Victor')">Victor</div>
+      </div>
+    </div>
+    
+    <div class="menu-item">Strings
+      <div class="submenu">
+        <div onclick="applyBrand('Yonex')">Yonex</div>
+        <div onclick="applyBrand('Li-Ning')">Li-Ning</div>
+        <div onclick="applyBrand('Victor')">Victor</div>
+      </div>
+    </div>
+    
+    <div class="menu-item">Bag
+      <div class="submenu">
+        <div onclick="applyBrand('Yonex')">Yonex</div>
+        <div onclick="applyBrand('Li-Ning')">Li-Ning</div>
+        <div onclick="applyBrand('Victor')">Victor</div>
+      </div>
+    </div>
+
+    <div class="menu-item">Accessories
+      <div class="submenu">
+        <div onclick="applyBrand('Yonex')">Yonex</div>
+        <div onclick="applyBrand('Li-Ning')">Li-Ning</div>
+        <div onclick="applyBrand('Victor')">Victor</div>
+      </div>
+    </div>
+
+    <div class="menu-item" onclick="applyCategory('Location')">Location</div>
+  </div>
+  <input type="text" id="search" placeholder="Search..." oninput="applySearch()">
 </header>
 
 <main class="grid" id="grid"></main>
@@ -109,80 +113,58 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// CSV URLs for each brand (replace with your published CSV links)
-const SHEET_URLS = {
-  "Yonex": "https://docs.google.com/spreadsheets/d/e/YONEX_SHEET/pub?output=csv",
-  "Li-Ning": "https://docs.google.com/spreadsheets/d/e/LINING_SHEET/pub?output=csv",
-  "Victor": "https://docs.google.com/spreadsheets/d/e/VICTOR_SHEET/pub?output=csv"
+// Google Sheet CSV links per brand
+const SHEETS = {
+  "Yonex": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=0&single=true&output=csv",
+  "Li-Ning": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1964036999&single=true&output=csv",
+  "Victor": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?gid=1101170186&single=true&output=csv"
 };
 
-let products = []; // loaded products
+let products = [];
+let filters = { category: "All", brand: "All", search: "" };
 
-// Load products from a brand
-function loadBrand(brand, callback){
-  const url = SHEET_URLS[brand];
-  Papa.parse(url, {
-    download:true,
-    header:true,
-    complete: function(results){
-      products = results.data.filter(p=>p.Name).map(p=>({
-        Name: p.Name,
-        Brand: p.Brand || brand,
-        Category: p.Category || "",
-        Price: parseFloat(p.Price)||0,
-        Image: p.Image || "",
-        Specs: p.Specs || ""
-      }));
-      if(callback) callback();
-    },
-    error:function(err){console.error("Error loading",brand,err);}
-  });
-}
-
-// Filter by brand + category
-function filterProducts(brand, category){
-  loadBrand(brand, ()=>{
-    const list = products.filter(p=>p.Category === category);
-    render(list);
-  });
-}
-
-// Show all products
-function showAll(){
-  let loadedCount = 0;
-  let allProducts = [];
-  const brands = Object.keys(SHEET_URLS);
-  brands.forEach(brand=>{
-    Papa.parse(SHEET_URLS[brand], {
-      download:true,
-      header:true,
-      complete:function(results){
-        const brandProducts = results.data.filter(p=>p.Name).map(p=>({
-          Name: p.Name,
-          Brand: p.Brand || brand,
-          Category: p.Category || "",
-          Price: parseFloat(p.Price)||0,
-          Image: p.Image || "",
-          Specs: p.Specs || ""
-        }));
-        allProducts = allProducts.concat(brandProducts);
-        loadedCount++;
-        if(loadedCount===brands.length){
-          products = allProducts;
-          render(products);
-        }
-      }
+// Fetch all sheets
+async function fetchSheets() {
+  products = [];
+  for (const [brand, url] of Object.entries(SHEETS)) {
+    await new Promise((resolve, reject) => {
+      Papa.parse(url, {
+        download: true,
+        header: true,
+        complete: function(results) {
+          results.data.forEach(p => {
+            if(p.Name) products.push({
+              Name: p.Name,
+              Brand: brand,
+              Category: p.Category || "Accessories",
+              Price: parseFloat(p.Price) || 0,
+              Image: p.Image || "",
+              Specs: p.Specs || ""
+            });
+          });
+          resolve();
+        },
+        error: function(err){ console.error(err); reject(err); }
+      });
     });
-  });
+  }
+  render();
 }
 
-// Render function
-function render(list=products){
+// Render products
+function render() {
   const grid = document.getElementById('grid');
-  grid.innerHTML="";
-  list.forEach(p=>{
-    const c = document.createElement("div"); c.className="card";
-    c.innerHTML=`
+  grid.innerHTML = "";
+  let list = products.slice();
+
+  if(filters.category !== "All" && filters.category !== "Location") list = list.filter(p => p.Category === filters.category);
+  if(filters.brand !== "All") list = list.filter(p => p.Brand === filters.brand);
+  if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()));
+
+  list.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
       <img src="${p.Image}" alt="${p.Name}">
       <div class="body">
         <div style="font-weight:800">${p.Name}</div>
@@ -190,28 +172,32 @@ function render(list=products){
         <button onclick='openModal(${JSON.stringify(p)})'>View</button>
       </div>
     `;
-    grid.appendChild(c);
+    grid.appendChild(card);
   });
 }
 
-// Modal functions
+// Filters
+function applyCategory(cat){ filters.category = cat; filters.brand="All"; render(); }
+function applyBrand(brand){ filters.brand = brand; render(); }
+function applySearch(){ filters.search = document.getElementById('search').value; render(); }
+
+// Modal
 function openModal(p){
   document.getElementById('modalBack').style.display="flex";
-  document.getElementById('mtitle').textContent = p.Name;
-  document.getElementById('mimg').src = p.Image;
-  document.getElementById('mname').textContent = p.Name;
-  document.getElementById('mbrand').textContent = p.Brand+" · "+p.Category;
-  document.getElementById('mprice').textContent = "$"+p.Price.toFixed(2);
-  document.getElementById('mspecs').textContent = p.Specs;
-  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
+  document.getElementById('mtitle').textContent=p.Name;
+  document.getElementById('mimg').src=p.Image;
+  document.getElementById('mname').textContent=p.Name;
+  document.getElementById('mbrand').textContent=p.Brand+" · "+p.Category;
+  document.getElementById('mprice').textContent="$"+p.Price.toFixed(2);
+  document.getElementById('mspecs').textContent=p.Specs;
+  document.getElementById('copyBtn').onclick=()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
   document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
 }
-function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
-function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
 
-// Load all on page load
-showAll();
+function closeModal(e){ if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none"; } }
+function orderText(p){ return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`; }
+
+fetchSheets();
 </script>
-
 </body>
 </html>
