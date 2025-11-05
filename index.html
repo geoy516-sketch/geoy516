@@ -8,31 +8,13 @@
 body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
 .nav .brand{font-weight:800;font-size:1.2rem;}
-.nav .menu{display:flex;gap:12px;align-items:center;position:relative;}
-.mainBtn{position:relative;}
-.mainBtn > button{padding:6px 12px;border:none;border-radius:999px;background:#fff;color:#047857;font-weight:600;cursor:pointer;}
-.mainBtn > button:hover{background:#047857;color:#fff;}
-.dropdown{
-  display:flex;flex-direction:column;
-  position:absolute;top:100%;left:0;
-  background:#fff;border-radius:8px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
-  min-width:120px;
-  opacity:0;visibility:hidden;
-  transform:translateY(-10px);
-  transition:all 0.25s ease;
-  z-index:5;
-}
-.mainBtn:hover .dropdown,
-.mainBtn:focus-within .dropdown {
-  opacity:1;visibility:visible;transform:translateY(0);
-}
-.dropdown button{
-  border:none;background:#fff;color:#047857;
-  padding:6px 12px;text-align:left;cursor:pointer;
-}
-.dropdown button:hover{background:#047857;color:#fff;}
-.nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
+.nav .menu{display:flex;gap:20px;}
+.nav .menu-item{position:relative;}
+.nav .menu-item > button{background:none;border:none;color:#fff;font-weight:700;cursor:pointer;}
+.nav .submenu{position:absolute;top:100%;left:0;background:#10b981;color:#fff;display:none;flex-direction:column;min-width:120px;border-radius:8px;overflow:hidden;z-index:20;}
+.nav .submenu button{background:#10b981;border:none;color:#fff;padding:8px 12px;text-align:left;cursor:pointer;}
+.nav .submenu button:hover{background:#047857;}
+.nav .menu-item:hover .submenu{display:flex;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
 .card img{width:100%;height:200px;object-fit:cover;}
@@ -54,52 +36,42 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <header class="nav">
   <div class="brand">SmashHub</div>
   <div class="menu">
-    <div class="mainBtn">
-      <button>All</button>
-    </div>
-    <div class="mainBtn">
-      <button>Badminton</button>
-      <div class="dropdown">
-        <button onclick="filterSub('Yonex')">Yonex</button>
-        <button onclick="filterSub('Li-Ning')">Li-Ning</button>
-        <button onclick="filterSub('Victor')">Victor</button>
+    <button onclick="filterAll()">All</button>
+
+    <div class="menu-item">
+      <button>Yonex</button>
+      <div class="submenu">
+        <button onclick="filterBrandItem('Yonex','Racket')">Racket</button>
+        <button onclick="filterBrandItem('Yonex','Bag')">Bag</button>
+        <button onclick="filterBrandItem('Yonex','Shoes')">Shoes</button>
+        <button onclick="filterBrandItem('Yonex','Strings')">Strings</button>
+        <button onclick="filterBrandItem('Yonex','Accessories')">Accessories</button>
       </div>
     </div>
-    <div class="mainBtn">
-      <button>Shoes</button>
-      <div class="dropdown">
-        <button onclick="filterSub('Yonex')">Yonex</button>
-        <button onclick="filterSub('Li-Ning')">Li-Ning</button>
-        <button onclick="filterSub('Victor')">Victor</button>
+
+    <div class="menu-item">
+      <button>Li-Ning</button>
+      <div class="submenu">
+        <button onclick="filterBrandItem('Li-Ning','Racket')">Racket</button>
+        <button onclick="filterBrandItem('Li-Ning','Bag')">Bag</button>
+        <button onclick="filterBrandItem('Li-Ning','Shoes')">Shoes</button>
+        <button onclick="filterBrandItem('Li-Ning','Strings')">Strings</button>
+        <button onclick="filterBrandItem('Li-Ning','Accessories')">Accessories</button>
       </div>
     </div>
-    <div class="mainBtn">
-      <button>Strings</button>
-      <div class="dropdown">
-        <button onclick="filterSub('Yonex')">Yonex</button>
-        <button onclick="filterSub('Li-Ning')">Li-Ning</button>
-        <button onclick="filterSub('Victor')">Victor</button>
+
+    <div class="menu-item">
+      <button>Victor</button>
+      <div class="submenu">
+        <button onclick="filterBrandItem('Victor','Racket')">Racket</button>
+        <button onclick="filterBrandItem('Victor','Bag')">Bag</button>
+        <button onclick="filterBrandItem('Victor','Shoes')">Shoes</button>
+        <button onclick="filterBrandItem('Victor','Strings')">Strings</button>
+        <button onclick="filterBrandItem('Victor','Accessories')">Accessories</button>
       </div>
     </div>
-    <div class="mainBtn">
-      <button>Bag</button>
-      <div class="dropdown">
-        <button onclick="filterSub('Yonex')">Yonex</button>
-        <button onclick="filterSub('Li-Ning')">Li-Ning</button>
-        <button onclick="filterSub('Victor')">Victor</button>
-      </div>
-    </div>
-    <div class="mainBtn">
-      <button>Accessories</button>
-      <div class="dropdown">
-        <button onclick="filterSub('Yonex')">Yonex</button>
-        <button onclick="filterSub('Li-Ning')">Li-Ning</button>
-        <button onclick="filterSub('Victor')">Victor</button>
-      </div>
-    </div>
-    <div class="mainBtn">
-      <button>Location</button>
-    </div>
+
+    <button onclick="filterLocation()">Location</button>
   </div>
 </header>
 
@@ -132,43 +104,38 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Google Sheet CSV
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?output=csv";
-
+// Google Sheet CSV link
+const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_LINK_HERE";
 let products = [];
-let filters = { search:"", category:"All", sub:"" };
+let filters = {brand: null, category: null};
 
-// Fetch products
+// Load products
 Papa.parse(SHEET_CSV_URL, {
-  download:true,
-  header:true,
-  complete:function(results){
-    products = results.data.filter(p=>p.Name).map(p=>({
+  download: true,
+  header: true,
+  complete: function(results){
+    products = results.data.filter(p => p.Name).map(p => ({
       Name: p.Name,
-      Brand: p.Brand||"",
-      Category: p.Category||"Accessories",
-      Price: parseFloat(p.Price)||0,
-      Image: p.Image||"",
-      Specs: p.Specs||"",
-      Sub: p.Sub||""
+      Brand: p.Brand,
+      Category: p.Category,
+      Price: parseFloat(p.Price) || 0,
+      Image: p.Image || "",
+      Specs: p.Specs || ""
     }));
     render();
   }
 });
 
-// Render
 function render(){
   const grid = document.getElementById('grid');
-  grid.innerHTML="";
+  grid.innerHTML = "";
   let list = products.slice();
-  const q = filters.search.toLowerCase();
-  if(q) list = list.filter(p=>p.Name.toLowerCase().includes(q) || p.Brand.toLowerCase().includes(q));
-  if(filters.category !== "All") list = list.filter(p=>p.Category===filters.category);
-  if(filters.sub) list = list.filter(p=>p.Sub===filters.sub);
+
+  if(filters.brand) list = list.filter(p=>p.Brand===filters.brand);
+  if(filters.category) list = list.filter(p=>p.Category===filters.category);
 
   list.forEach(p=>{
-    const c = document.createElement("div");
-    c.className="card";
+    const c = document.createElement("div"); c.className="card";
     c.innerHTML=`
       <img src="${p.Image}" alt="${p.Name}">
       <div class="body">
@@ -181,11 +148,13 @@ function render(){
   });
 }
 
-// Filter by subcategory
-function filterSub(sub){
-  filters.sub = sub;
+function filterBrandItem(brand, category){
+  filters.brand = brand;
+  filters.category = category;
   render();
 }
+function filterAll(){ filters.brand=null; filters.category=null; render();}
+function filterLocation(){ alert("Show location info"); }
 
 // Modal
 function openModal(p){
@@ -196,14 +165,12 @@ function openModal(p){
   document.getElementById('mbrand').textContent=p.Brand+" · "+p.Category;
   document.getElementById('mprice').textContent="$"+p.Price.toFixed(2);
   document.getElementById('mspecs').textContent=p.Specs;
-  document.getElementById('copyBtn').onclick=()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
+  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
   document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
 }
 function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
 function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
-
-// Search
-document.getElementById('search').addEventListener('input', e=>{filters.search=e.target.value; render();});
 </script>
+
 </body>
 </html>
