@@ -12,9 +12,8 @@ body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .nav .menu > .dropdown{position:relative;}
 .nav .menu button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;}
 .nav .menu button.active{background:#047857;color:#fff;}
-.nav .submenu{position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;display:none;flex-direction:column;box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+.nav .submenu{display:none;position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;flex-direction:column;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:5;}
 .nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;}
-.nav .dropdown:hover .submenu{display:flex;}
 .nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
@@ -37,7 +36,7 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <header class="nav">
   <div class="brand">SmashHub</div>
   <div class="menu">
-    <button id="allBtn" class="active">All</button>
+    <button id="allBtn">All</button>
     <div class="dropdown">
       <button>Yonex</button>
       <div class="submenu">
@@ -102,15 +101,17 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Google Sheet CSV links per brand
 const SHEET_URLS = [
-  { brand: "Yonex", url: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv" },
-  { brand: "Li-Ning", url: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=1964036999&single=true&output=csv" },
-  { brand: "Victor", url: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=1101170186&single=true&output=csv" }
+  { brand: "Yonex", url: "YOUR_YONEX_CSV_URL" },
+  { brand: "Li-Ning", url: "YOUR_LINING_CSV_URL" },
+  { brand: "Victor", url: "YOUR_VICTOR_CSV_URL" }
 ];
 
 let products = [];
 let filters = { search:"", brand:null, category:null };
 
+// Fetch all sheets
 function fetchAllSheets() {
   let loaded = 0;
   SHEET_URLS.forEach(sheet => {
@@ -118,15 +119,17 @@ function fetchAllSheets() {
       download: true,
       header: true,
       complete: function(results){
-        const sheetProducts = results.data.filter(p=>p.Name).map(p=>({
-          Name: p.Name,
-          Brand: sheet.brand,
-          Category: p.Category || "Accessories",
-          Price: parseFloat(p.Price) || 0,
-          Image: p.Image || "",
-          Specs: p.Specs || "",
-          Tag: p.Tag || ""
-        }));
+        const sheetProducts = results.data
+          .filter(p => p.Name)
+          .map(p => ({
+            Name: p.Name,
+            Brand: sheet.brand,
+            Category: p.Category || "Accessories",
+            Price: parseFloat(p.Price) || 0,
+            Image: p.Image || "",
+            Specs: p.Specs || "",
+            Tag: p.Tag || ""
+          }));
         products = products.concat(sheetProducts);
         loaded++;
         if(loaded === SHEET_URLS.length) render();
@@ -137,10 +140,12 @@ function fetchAllSheets() {
 
 fetchAllSheets();
 
+// Render products
 function render(){
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
   let list = products.slice();
+
   if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()) || p.Brand.toLowerCase().includes(filters.search.toLowerCase()));
   if(filters.brand) list = list.filter(p => p.Brand === filters.brand);
   if(filters.category) list = list.filter(p => p.Category === filters.category);
@@ -159,33 +164,37 @@ function render(){
   });
 }
 
-// Navigation
-const allBtn = document.getElementById('allBtn');
-const submenuButtons = document.querySelectorAll('.submenu button');
+// Dropdown menu click toggle
+document.querySelectorAll('.dropdown > button').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    const submenu = btn.nextElementSibling;
+    const isOpen = submenu.style.display === "flex";
+    document.querySelectorAll('.submenu').forEach(sm=>sm.style.display="none");
+    submenu.style.display = isOpen ? "none" : "flex";
+    e.stopPropagation();
+  });
+});
 
-function clearActiveButtons() {
-  allBtn.classList.remove('active');
-  submenuButtons.forEach(b => b.classList.remove('active'));
-}
+// Close submenu if clicking outside
+document.addEventListener('click', ()=>{
+  document.querySelectorAll('.submenu').forEach(sm=>sm.style.display="none");
+});
 
-submenuButtons.forEach(btn=>{
+// Submenu buttons
+document.querySelectorAll('.submenu button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     filters.brand = btn.dataset.brand;
     filters.category = btn.dataset.cat;
     render();
-    clearActiveButtons();
-    btn.classList.add('active');
   });
 });
 
-allBtn.addEventListener('click', ()=>{
-  filters.brand = null;
-  filters.category = null;
-  render();
-  clearActiveButtons();
-  allBtn.classList.add('active');
+// All button
+document.getElementById('allBtn').addEventListener('click', ()=>{
+  filters.brand = null; filters.category = null; render();
 });
 
+// Search
 function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
 
 // Modal
@@ -197,7 +206,7 @@ function openModal(p){
   document.getElementById('mbrand').textContent=p.Brand+" · "+p.Category;
   document.getElementById('mprice').textContent="$"+p.Price.toFixed(2);
   document.getElementById('mspecs').textContent=p.Specs;
-  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));};
+  document.getElementById('copyBtn').onclick = ()=>{navigator.clipboard.writeText(orderText(p)).then(()=>alert("Copied!"));}
   document.getElementById('mailto').href="mailto:sales@smashhub.example?subject=Order: "+encodeURIComponent(p.Name)+"&body="+encodeURIComponent(orderText(p));
 }
 function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
