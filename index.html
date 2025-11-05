@@ -68,22 +68,19 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 
 <footer>© <span id="year"></span> SmashHub — No cart, order via email</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Your published Google Sheet CSV link
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pub?output=csv";
+const SHEET_JSON_URL = "https://opensheet.elk.sh/YOUR_SHEET_ID/Sheet1"; // Use OpenSheet API for JSON
 
 let products = [];
 let filters = { search:"", category:"All", new:false };
 
-// Fetch products from Google Sheet
-Papa.parse(SHEET_CSV_URL, {
-  download: true,
-  header: true,
-  complete: function(results) {
-    products = results.data.filter(p => p.Name).map(p => ({
+// Fetch Google Sheet as JSON
+fetch(SHEET_JSON_URL)
+  .then(res => res.json())
+  .then(data => {
+    products = data.filter(p => p.Name).map(p => ({
       Name: p.Name,
       Brand: p.Brand || "",
       Category: p.Category || "Accessories",
@@ -93,15 +90,14 @@ Papa.parse(SHEET_CSV_URL, {
       Tag: p.Tag || ""
     }));
     render();
-  },
-  error: function(err) {
-    alert("Error loading Google Sheet CSV");
+  })
+  .catch(err => {
+    alert("Error loading Google Sheet JSON");
     console.error(err);
-  }
-});
+  });
 
 // Render products
-function render(){
+function render() {
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
   let list = products.slice();
@@ -111,9 +107,10 @@ function render(){
   if(filters.category!=="All") list = list.filter(p=>p.Category===filters.category);
   if(filters.new) list = list.filter(p=>p.Tag==="new");
 
-  list.forEach(p=>{
-    const c = document.createElement("div"); c.className="card";
-    c.innerHTML=`
+  list.forEach(p => {
+    const c = document.createElement("div");
+    c.className = "card";
+    c.innerHTML = `
       <img src="${p.Image}" alt="${p.Name}">
       <div class="body">
         <div style="font-weight:800">${p.Name}</div>
@@ -145,13 +142,13 @@ newBtn.addEventListener('click', ()=>{
   render();
 });
 
-// Search filter
-function applyFilters(){
+// Search
+function applyFilters() {
   filters.search = document.getElementById('search').value;
   render();
 }
 
-// Modal
+// Modal functions
 function openModal(p){
   document.getElementById('modalBack').style.display="flex";
   document.getElementById('mtitle').textContent = p.Name;
