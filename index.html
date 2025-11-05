@@ -8,13 +8,14 @@
 body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
 .nav{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
 .nav .brand{font-weight:800;font-size:1.2rem;}
-.nav .menu{display:flex;gap:20px;}
-.nav .menu-item{position:relative;}
-.nav .menu-item > button{background:none;border:none;color:#fff;font-weight:700;cursor:pointer;}
-.nav .submenu{position:absolute;top:100%;left:0;background:#10b981;color:#fff;display:none;flex-direction:column;min-width:120px;border-radius:8px;overflow:hidden;z-index:20;}
-.nav .submenu button{background:#10b981;border:none;color:#fff;padding:8px 12px;text-align:left;cursor:pointer;}
-.nav .submenu button:hover{background:#047857;}
-.nav .menu-item:hover .submenu{display:flex;}
+.nav .menu{display:flex;gap:16px;position:relative;}
+.nav .menu > .dropdown{position:relative;}
+.nav .menu button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;}
+.nav .menu button.active{background:#047857;color:#fff;}
+.nav .submenu{position:absolute;top:100%;left:0;background:#fff;color:#047857;min-width:120px;border-radius:8px;display:none;flex-direction:column;box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+.nav .submenu button{padding:6px 12px;text-align:left;white-space:nowrap;}
+.nav .dropdown:hover .submenu{display:flex;}
+.nav input{margin-left:auto;padding:6px 12px;border-radius:999px;border:none;width:200px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1100px;margin:20px auto;padding:0 20px;}
 .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);display:flex;flex-direction:column;}
 .card img{width:100%;height:200px;object-fit:cover;}
@@ -36,43 +37,40 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <header class="nav">
   <div class="brand">SmashHub</div>
   <div class="menu">
-    <button onclick="filterAll()">All</button>
-
-    <div class="menu-item">
+    <div class="dropdown">
       <button>Yonex</button>
       <div class="submenu">
-        <button onclick="filterBrandItem('Yonex','Racket')">Racket</button>
-        <button onclick="filterBrandItem('Yonex','Bag')">Bag</button>
-        <button onclick="filterBrandItem('Yonex','Shoes')">Shoes</button>
-        <button onclick="filterBrandItem('Yonex','Strings')">Strings</button>
-        <button onclick="filterBrandItem('Yonex','Accessories')">Accessories</button>
+        <button data-brand="Yonex" data-cat="Racket">Racket</button>
+        <button data-brand="Yonex" data-cat="Shoes">Shoes</button>
+        <button data-brand="Yonex" data-cat="Strings">Strings</button>
+        <button data-brand="Yonex" data-cat="Bag">Bag</button>
+        <button data-brand="Yonex" data-cat="Accessories">Accessories</button>
       </div>
     </div>
-
-    <div class="menu-item">
+    <div class="dropdown">
       <button>Li-Ning</button>
       <div class="submenu">
-        <button onclick="filterBrandItem('Li-Ning','Racket')">Racket</button>
-        <button onclick="filterBrandItem('Li-Ning','Bag')">Bag</button>
-        <button onclick="filterBrandItem('Li-Ning','Shoes')">Shoes</button>
-        <button onclick="filterBrandItem('Li-Ning','Strings')">Strings</button>
-        <button onclick="filterBrandItem('Li-Ning','Accessories')">Accessories</button>
+        <button data-brand="Li-Ning" data-cat="Racket">Racket</button>
+        <button data-brand="Li-Ning" data-cat="Shoes">Shoes</button>
+        <button data-brand="Li-Ning" data-cat="Strings">Strings</button>
+        <button data-brand="Li-Ning" data-cat="Bag">Bag</button>
+        <button data-brand="Li-Ning" data-cat="Accessories">Accessories</button>
       </div>
     </div>
-
-    <div class="menu-item">
+    <div class="dropdown">
       <button>Victor</button>
       <div class="submenu">
-        <button onclick="filterBrandItem('Victor','Racket')">Racket</button>
-        <button onclick="filterBrandItem('Victor','Bag')">Bag</button>
-        <button onclick="filterBrandItem('Victor','Shoes')">Shoes</button>
-        <button onclick="filterBrandItem('Victor','Strings')">Strings</button>
-        <button onclick="filterBrandItem('Victor','Accessories')">Accessories</button>
+        <button data-brand="Victor" data-cat="Racket">Racket</button>
+        <button data-brand="Victor" data-cat="Shoes">Shoes</button>
+        <button data-brand="Victor" data-cat="Strings">Strings</button>
+        <button data-brand="Victor" data-cat="Bag">Bag</button>
+        <button data-brand="Victor" data-cat="Accessories">Accessories</button>
       </div>
     </div>
-
-    <button onclick="filterLocation()">Location</button>
+    <button id="allBtn">All</button>
+    <button id="locationBtn">Location</button>
   </div>
+  <input type="text" id="search" placeholder="Search..." oninput="applyFilters()">
 </header>
 
 <main class="grid" id="grid"></main>
@@ -104,35 +102,54 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Google Sheet CSV link
-const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_LINK_HERE";
+// Replace these with your published CSV links
+const SHEET_URLS = [
+  { brand: "Yonex", url: "YOUR_YONEX_CSV_LINK" },
+  { brand: "Li-Ning", url: "YOUR_LINING_CSV_LINK" },
+  { brand: "Victor", url: "YOUR_VICTOR_CSV_LINK" }
+];
+
 let products = [];
-let filters = {brand: null, category: null};
+let filters = { search:"", brand:null, category:null };
 
-// Load products
-Papa.parse(SHEET_CSV_URL, {
-  download: true,
-  header: true,
-  complete: function(results){
-    products = results.data.filter(p => p.Name).map(p => ({
-      Name: p.Name,
-      Brand: p.Brand,
-      Category: p.Category,
-      Price: parseFloat(p.Price) || 0,
-      Image: p.Image || "",
-      Specs: p.Specs || ""
-    }));
-    render();
-  }
-});
+// Fetch all sheets
+function fetchAllSheets() {
+  let loaded = 0;
+  SHEET_URLS.forEach(sheet => {
+    Papa.parse(sheet.url, {
+      download: true,
+      header: true,
+      complete: function(results){
+        const sheetProducts = results.data
+          .filter(p => p.Name)
+          .map(p => ({
+            Name: p.Name,
+            Brand: sheet.brand,
+            Category: p.Category || "Accessories",
+            Price: parseFloat(p.Price) || 0,
+            Image: p.Image || "",
+            Specs: p.Specs || "",
+            Tag: p.Tag || ""
+          }));
+        products = products.concat(sheetProducts);
+        loaded++;
+        if(loaded === SHEET_URLS.length) render();
+      }
+    });
+  });
+}
 
+fetchAllSheets();
+
+// Render products
 function render(){
   const grid = document.getElementById('grid');
   grid.innerHTML = "";
   let list = products.slice();
 
-  if(filters.brand) list = list.filter(p=>p.Brand===filters.brand);
-  if(filters.category) list = list.filter(p=>p.Category===filters.category);
+  if(filters.search) list = list.filter(p => p.Name.toLowerCase().includes(filters.search.toLowerCase()) || p.Brand.toLowerCase().includes(filters.search.toLowerCase()));
+  if(filters.brand) list = list.filter(p => p.Brand === filters.brand);
+  if(filters.category) list = list.filter(p => p.Category === filters.category);
 
   list.forEach(p=>{
     const c = document.createElement("div"); c.className="card";
@@ -148,13 +165,16 @@ function render(){
   });
 }
 
-function filterBrandItem(brand, category){
-  filters.brand = brand;
-  filters.category = category;
-  render();
-}
-function filterAll(){ filters.brand=null; filters.category=null; render();}
-function filterLocation(){ alert("Show location info"); }
+// Navigation buttons
+document.querySelectorAll('.submenu button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    filters.brand = btn.dataset.brand;
+    filters.category = btn.dataset.cat;
+    render();
+  });
+});
+document.getElementById('allBtn').addEventListener('click', ()=>{ filters.brand = null; filters.category = null; render(); });
+function applyFilters(){ filters.search = document.getElementById('search').value; render(); }
 
 // Modal
 function openModal(p){
@@ -171,6 +191,5 @@ function openModal(p){
 function closeModal(e){if(e===true||e.target.id==='modalBack'){document.getElementById('modalBack').style.display="none";}}
 function orderText(p){return `I'd like to order:\n${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${p.Price}\nSpecs: ${p.Specs}`;}
 </script>
-
 </body>
 </html>
