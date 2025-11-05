@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SmashHub — Badminton Gear (No Cart)</title>
+  <meta name="description" content="Badminton rackets, shoes, strings and accessories. No cart — message or email to order." />
+
+  <style>
+    /* ---------- Simple reset & palette ---------- */
+    :root{
+      --bg:#f8faf8; --card:#fff; --muted:#666; --accent:#047857; --accent-2:#10b981;
+      --glass: rgba(255,255,255,0.6);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#111;line-height:1.4}
+    a{color:inherit}
+
+    /* ---------- navbar ---------- */
+    .nav{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:20}
+    .brand{font-weight:800;font-size:1.15rem}
+    .nav .search{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .search input{padding:8px 12px;border-radius:999px;border:none;width:220px;outline:none}
+
+    /* ---------- hero ---------- */
+    .hero{max-width:1100px;margin:28px auto;padding:28px;border-radius:14px;display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:center;background:linear-gradient(180deg,#ffffff,#f6fff8);box-shadow:0 6px 24px rgba(3,7,18,0.06)}
+    .hero h1{margin:0;font-size:2rem}
+    .hero p{color:var(--muted);margin-top:8px}
+
+    /* ---------- controls ---------- */
+    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .chip{padding:8px 12px;border-radius:999px;border:1px solid #e6f3ea;background:#fff;cursor:pointer;font-weight:600}
+    .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .select{padding:8px 10px;border-radius:8px;border:1px solid #ddd;background:#fff}
+
+    /* ---------- grid ---------- */
+    .grid{max-width:1100px;margin:20px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;padding:0 20px 40px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(3,7,18,0.06);display:flex;flex-direction:column}
+    .card .img{aspect-ratio:1/1;background:#f3f6f4;display:grid;place-items:center}
+    .card .img img{width:100%;height:100%;object-fit:cover}
+    .card .body{padding:12px;display:flex;flex-direction:column;gap:8px}
+    .brandline{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:0.9rem}
+    .price{font-weight:700}
+    .badges{display:flex;gap:8px}
+    .btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-weight:700}
+    .btn.ghost{background:#fff;border:1px solid #ddd;color:var(--muted)}
+
+    /* ---------- modal ---------- */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(3,7,18,0.45);display:none;align-items:center;justify-content:center;padding:20px}
+    .modal{max-width:720px;width:100%;background:#fff;border-radius:12px;overflow:hidden}
+    .modal .content{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px}
+    .modal img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+    .modal .meta{display:flex;flex-direction:column;gap:10px}
+    .close{margin-left:auto;padding:6px;border-radius:8px;border:none;background:#eee;cursor:pointer}
+
+    /* ---------- footer ---------- */
+    footer{background:#fff;border-top:1px solid #eee;padding:18px 20px;text-align:center;color:var(--muted);margin-top:20px}
+
+    /* ---------- small screens ---------- */
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr; padding:20px}
+      .nav .search input{width:140px}
+      .modal .content{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- navbar -->
+  <header class="nav">
+    <div class="brand">SmashHub</div>
+    <nav style="display:flex;gap:12px;align-items:center">
+      <div class="chip active" data-cat="All">All</div>
+      <div class="chip" data-cat="Rackets">Rackets</div>
+      <div class="chip" data-cat="Shoes">Shoes</div>
+      <div class="chip" data-cat="Strings">Strings</div>
+      <div class="chip" data-cat="Accessories">Accessories</div>
+    </nav>
+
+    <div class="search">
+      <input id="search" placeholder="Search rackets, shoes..." oninput="applyFilters()" />
+      <select id="sort" class="select" onchange="applyFilters()">
+        <option value="">Sort</option>
+        <option value="price-asc">Price ↑</option>
+        <option value="price-desc">Price ↓</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- hero -->
+  <section class="hero" role="banner">
+    <div>
+      <h1>SmashHub — curated badminton gear</h1>
+      <p>Top rackets, shoes and strings from Yonex, Victor, Li-Ning. We don’t use a cart — message or email to order. Connect a Google Sheet CSV to show live inventory.</p>
+
+      <div style="margin-top:16px" class="controls">
+        <button class="chip" id="saleBtn" onclick="toggleSale()">Sale</button>
+        <button class="chip" id="newBtn" onclick="toggleNew()">New</button>
+        <button class="chip" onclick="clearFilters()">Clear</button>
+      </div>
+
+      <div style="margin-top:14px;color:var(--muted);font-size:0.95rem">
+        <strong>Contact:</strong> sales@smashhub.example • DM @smashhub.store
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center">
+      <div style="width:100%;height:220px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#e6fff3,#ecfdf5)">
+        <img src="https://placehold.co/420x220?text=SmashHub" alt="hero" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div style="font-size:0.9rem;color:var(--muted)">No cart — copy order text or email to purchase</div>
+    </div>
+  </section>
+
+  <!-- products -->
+  <main class="grid" id="grid">
+    <!-- product cards inserted by JS -->
+  </main>
+
+  <!-- modal -->
+  <div id="modalBack" class="modal-backdrop" onclick="closeModal(event)">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mtitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #f1f1f1">
+        <strong id="mtitle">Product</strong>
+        <button class="close" onclick="closeModal(true)">✕</button>
+      </div>
+
+      <div class="content">
+        <div style="min-height:220px"><img id="mimg" src="" alt="product"></div>
+        <div class="meta">
+          <div style="font-weight:800" id="mname"></div>
+          <div class="brandline"><span id="mbrand"></span><span class="price" id="mprice"></span></div>
+          <div id="mspecs" style="color:var(--muted)"></div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn" id="copyBtn">Copy Order Text</button>
+            <a id="mailto" class="btn ghost" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none" target="_blank">Email to Order</a>
+          </div>
+
+          <div style="margin-top:8px;color:var(--muted);font-size:0.9rem">
+            We don't use a cart. Copy the order text or email us to purchase.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    © <span id="year"></span> SmashHub — curated badminton gear • No cart
+  </footer>
+
+  <!-- PapaParse CDN (optional, only used if you set SHEET_CSV_URL) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <script>
+    // -------- CONFIG: paste your published Google Sheet CSV URL here (or leave empty to use demo) ----------
+    const SHEET_CSV_URL = ""; // e.g. "https://docs.google.com/spreadsheets/d/e/XXXX/pub?output=csv"
+
+    // ---------- demo dataset ----------
+    const DEMO = [
+      { Name: "Astrox 88D Pro", Brand: "Yonex", Category: "Rackets", Price: 259.99, Image: "https://images.unsplash.com/photo-1603811268787-8f83a3f4f5b8?q=80&w=1200&auto=format&fit=crop", Specs: "4U/G5 · Head-Heavy · Stiff", Tag: "new" },
+      { Name: "Arcsaber 11 Pro", Brand: "Yonex", Category: "Rackets", Price: 239.99, Image: "https://images.unsplash.com/photo-1620116034147-0ac2f5b8c1f0?q=80&w=1200&auto=format&fit=crop", Specs: "3U/G5 · Even Balance · Stiff", Tag: "" },
+      { Name: "Victor Auraspeed 90K II", Brand: "Victor", Category: "Rackets", Price: 229.95, Image: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?q=80&w=1200&auto=format&fit=crop", Specs: "4U/G5 · Even · Medium", Tag: "sale" },
+      { Name: "Victor A970ACE", Brand: "Victor", Category: "Shoes", Price: 139.99, Image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop", Specs: "Stability · Cushion · Indoor", Tag: "new" },
+      { Name: "Yonex Pro 9-Pack Bag", Brand: "Yonex", Category: "Bags", Price: 119.99, Image: "https://images.unsplash.com/photo-1611672585731-d8516a5b6a25?q=80&w=1200&auto=format&fit=crop", Specs: "Thermo Guard · 2 Main + 1 Shoes", Tag: "" },
+      { Name: "Li-Ning No.1 String (Set)", Brand: "Li-Ning", Category: "Strings", Price: 7.99, Image: "https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1200&auto=format&fit=crop", Specs: "Repulsion · 0.65mm", Tag: "" }
+    ];
+
+    let products = [];
+    let selectedProduct = null;
+    let filters = { search: "", category: "All", sort: "", onlySale: false, onlyNew: false };
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // fetch sheet or load demo
+    if (SHEET_CSV_URL) {
+      Papa.parse(SHEET_CSV_URL, { download:true, header:true,
+        complete: (res) => {
+          products = res.data.filter(r => r.Name).map(r => ({
+            Name: r.Name,
+            Brand: r.Brand || "",
+            Category: r.Category || "Accessories",
+            Price: parseFloat(String(r.Price).replace(/[^0-9.]/g,"")) || 0,
+            Image: r.Image || "",
+            Specs: r.Specs || "",
+            Tag: r.Tag || ""
+          }));
+          render();
+        },
+        error: () => { products = DEMO; render(); }
+      });
+    } else {
+      products = DEMO;
+      render();
+    }
+
+    // UI helpers
+    function el(tag,props,children){const e=document.createElement(tag); if(props) for(const k in props) { if(k==='class') e.className=props[k]; else if(k.startsWith('on')) e.addEventListener(k.substring(2), props[k]); else e.setAttribute(k,props[k]); } if(children) e.innerHTML=children; return e}
+
+    function render() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      let list = products.slice();
+
+      // search
+      const q = filters.search.trim().toLowerCase();
+      if(q) list = list.filter(p => (p.Name||'').toLowerCase().includes(q) || (p.Brand||'').toLowerCase().includes(q) || (p.Specs||'').toLowerCase().includes(q));
+
+      // category
+      if(filters.category && filters.category !== 'All') list = list.filter(p => (p.Category||'').toLowerCase() === filters.category.toLowerCase());
+
+      // sale/new
+      if(filters.onlySale) list = list.filter(p => (p.Tag||'').toLowerCase() === 'sale');
+      if(filters.onlyNew) list = list.filter(p => (p.Tag||'').toLowerCase() === 'new');
+
+      // sort
+      if(filters.sort === 'price-asc') list.sort((a,b)=>a.Price-b.Price);
+      if(filters.sort === 'price-desc') list.sort((a,b)=>b.Price-a.Price);
+
+      // create cards
+      list.forEach((p, i) => {
+        const c = el('article',{class:'card'});
+        const imgWrap = el('div',{class:'img'});
+        const img = document.createElement('img'); img.src = p.Image || 'assets/placeholder.jpg'; img.alt = p.Name || 'product';
+        img.onerror = ()=> img.src = 'https://placehold.co/600x600?text=Product';
+        imgWrap.appendChild(img);
+        c.appendChild(imgWrap);
+
+        const b = el('div',{class:'body'});
+        b.appendChild(el('div',null,`<div style="font-weight:800">${escapeHTML(p.Name)}</div>`));
+        b.appendChild(el('div',{class:'brandline'},`<span>${escapeHTML(p.Brand)}</span><span class="price">$${Number(p.Price).toFixed(2)}</span>`));
+        const badges = el('div',{class:'badges'});
+        if((p.Tag||'').toLowerCase()==='sale') badges.innerHTML = '<span style="background:#fee2e2;color:#b91c1c;padding:6px;border-radius:8px;font-size:12px;">SALE</span>';
+        if((p.Tag||'').toLowerCase()==='new') badges.innerHTML += '<span style="background:#ecfdf5;color:#065f46;padding:6px;border-radius:8px;font-size:12px;margin-left:6px">NEW</span>';
+        b.appendChild(badges);
+
+        const foot = el('div',null);
+        const viewBtn = el('button',{class:'btn', onClick:()=> openModal(p) }, 'View');
+        const copyBtn = el('button',{class:'btn ghost', onClick:()=> copyOrder(p) }, 'Copy Order');
+        foot.appendChild(viewBtn); foot.appendChild(copyBtn);
+        b.appendChild(foot);
+
+        c.appendChild(b);
+        grid.appendChild(c);
+      });
+
+      if(list.length===0){
+        grid.innerHTML = '<div style="grid-column:1/-1;padding:24px;text-align:center;color:#777">No products match your filters.</div>';
+      }
+    }
+
+    // filters wired to UI
+    document.querySelectorAll('.chip[data-cat]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.chip[data-cat]').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        filters.category = btn.getAttribute('data-cat');
+        applyFilters();
+      });
+    });
+
+    document.getElementById('search').addEventListener('input', (e)=>{filters.search = e.target.value; applyFilters()});
+    document.getElementById('sort').addEventListener('change', (e)=>{filters.sort = e.target.value; applyFilters()});
+
+    function applyFilters(){ render() }
+
+    function clearFilters(){
+      filters = { search:'', category:'All', sort:'', onlySale:false, onlyNew:false };
+      document.getElementById('search').value='';
+      document.getElementById('sort').value='';
+      document.querySelectorAll('.chip[data-cat]').forEach(b=>b.classList.remove('active'));
+      document.querySelector('.chip[data-cat="All"]').classList.add('active');
+      document.getElementById('saleBtn').classList.remove('active');
+      document.getElementById('newBtn').classList.remove('active');
+      render();
+    }
+
+    function toggleSale(){
+      filters.onlySale = !filters.onlySale;
+      document.getElementById('saleBtn').classList.toggle('active', filters.onlySale);
+      render();
+    }
+    function toggleNew(){
+      filters.onlyNew = !filters.onlyNew;
+      document.getElementById('newBtn').classList.toggle('active', filters.onlyNew);
+      render();
+    }
+
+    // modal behavior
+    function openModal(p){
+      selectedProduct = p;
+      document.getElementById('mtitle').textContent = p.Name;
+      document.getElementById('mimg').src = p.Image || 'https://placehold.co/900x600?text=Product';
+      document.getElementById('mname').textContent = p.Name;
+      document.getElementById('mbrand').textContent = p.Brand + ' · ' + (p.Category || '');
+      document.getElementById('mprice').textContent = '$' + Number(p.Price).toFixed(2);
+      document.getElementById('mspecs').textContent = p.Specs || '';
+      document.getElementById('modalBack').style.display = 'flex';
+      document.getElementById('copyBtn').onclick = ()=> copyOrder(p);
+      const mailto = `mailto:sales@smashhub.example?subject=Order%20Inquiry:%20${encodeURIComponent(p.Name)}&body=${encodeURIComponent(orderText(p))}`;
+      const ml = document.getElementById('mailto'); ml.href = mailto; ml.textContent = 'Email to Order';
+    }
+
+    function closeModal(e){
+      if(e===true || e.target.id==='modalBack'){document.getElementById('modalBack').style.display='none'; selectedProduct=null;}
+    }
+
+    function copyOrder(p){
+      const text = orderText(p);
+      navigator.clipboard.writeText(text).then(()=> alert('Order text copied to clipboard.')).catch(()=> prompt('Copy this text to order:', text));
+    }
+
+    function orderText(p){
+      return `I'd like to order this item:\n\nProduct: ${p.Name}\nBrand: ${p.Brand}\nCategory: ${p.Category}\nPrice: $${Number(p.Price).toFixed(2)}\nSpecs: ${p.Specs || ''}\n\nPlease confirm stock and lead time.`;
+    }
+
+    function escapeHTML(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]}); }
+
+    // keyboard: esc to close
+    document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(true) });
+
+  </script>
+
+</body>
+</html>
