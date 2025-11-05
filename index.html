@@ -73,14 +73,30 @@ footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;
 document.getElementById('year').textContent = new Date().getFullYear();
 
 // Example product list (for demo)
-let products = [
-  {Name:"Astrox 88D Pro", Brand:"Yonex", Category:"Rackets", Price:259.99, Image:"assets/racket1.jpg", Specs:"4U/G5 · Stiff", Tag:"new"},
-  {Name:"Victor Auraspeed", Brand:"Victor", Category:"Rackets", Price:229.95, Image:"assets/racket2.jpg", Specs:"4U/G5 · Medium", Tag:"sale"},
-  {Name:"Yonex Power Cushion", Brand:"Yonex", Category:"Shoes", Price:120.00, Image:"assets/shoe1.jpg", Specs:"Men US 9", Tag:"new"},
-  {Name:"Victor SH-A920", Brand:"Victor", Category:"Shoes", Price:110.00, Image:"assets/shoe2.jpg", Specs:"Women US 8", Tag:"sale"},
-  {Name:"BG65 Strings", Brand:"Yonex", Category:"Strings", Price:15.00, Image:"assets/string1.jpg", Specs:"0.70mm", Tag:"sale"},
-  {Name:"Grip Tape", Brand:"Yonex", Category:"Accessories", Price:5.00, Image:"assets/accessory1.jpg", Specs:"1 pc", Tag:"new"}
-];
+let products = [];
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyOxyhvA3RPlASauijohIlRS8O7fBqwaWw0LojpZwIMzntZEzLM_Qq2sxHJ2hA-PMyYLNzrUAQoyHT/pubhtml";
+
+Papa.parse(SHEET_CSV_URL, {
+  download: true,
+  header: true,
+  complete: function(results) {
+    products = results.data.filter(p => p.Name).map(p => ({
+      Name: p.Name,
+      Brand: p.Brand || "",
+      Category: p.Category || "Accessories",
+      Price: parseFloat(p.Price) || 0,
+      Image: p.Image || "",
+      Specs: p.Specs || "",
+      Tag: p.Tag || ""
+    }));
+    render(); // render products after fetching
+  },
+  error: function(err) {
+    alert("Error loading Google Sheet CSV");
+    console.error(err);
+  }
+});
+
 
 let filters = { search:"", category:"All", sale:false, new:false };
 
