@@ -5,39 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us - SmashHub</title>
 <style>
-body{font-family:Arial,sans-serif;margin:0;background:#f8faf8;color:#111;}
-header{background:linear-gradient(90deg,#047857,#10b981);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px;}
-header .brand{font-weight:800;font-size:1.2rem;}
-header .menu{display:flex;gap:16px;}
-header .menu button{padding:6px 12px;border:none;border-radius:8px;background:#fff;color:#047857;font-weight:600;cursor:pointer;}
-main{max-width:900px;margin:20px auto;padding:20px;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.06);}
-h1{color:#047857;}
-footer{background:#fff;border-top:1px solid #eee;padding:14px;text-align:center;color:#666;}
+body { font-family: Arial, sans-serif; margin:0; background:#f8faf8; color:#111; }
+header { background: linear-gradient(90deg,#047857,#10b981); color: #fff; padding: 14px 20px; }
+header h1 { margin: 0; font-size: 1.5rem; }
+main { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+h2 { color:#047857; }
+p { line-height: 1.6; margin-bottom: 16px; }
+footer { background:#fff; border-top:1px solid #eee; padding:14px; text-align:center; color:#666; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">SmashHub</div>
-  <div class="menu">
-    <button onclick="window.location.href='index.html'">Home</button>
-    <button onclick="window.location.href='about.html'">About Us</button>
-  </div>
+  <h1>About SmashHub</h1>
 </header>
 
 <main>
-  <h1>About SmashHub</h1>
-  <p>Welcome to SmashHub! This is a placeholder About Us page. Here you can describe your store, your mission, and your badminton products.</p>
-  <p>Example content:</p>
-  <ul>
-    <li>We provide high-quality badminton gear from top brands like Yonex, Li-Ning, and Victor.</li>
-    <li>Our goal is to make shopping simple and convenient.</li>
-    <li>Orders can be placed directly via email.</li>
-  </ul>
-  <p>Replace this content with your own story when ready.</p>
+  <h2>Welcome to SmashHub!</h2>
+  <p>This is a placeholder page for the “About Us” section. Here you can introduce your store, its mission, and what makes it unique.</p>
+  
+  <h2>Our Mission</h2>
+  <p>SmashHub is dedicated to providing high-quality badminton gear for players of all levels. From rackets and shoes to bags and accessories, we aim to make your badminton experience better and more enjoyable.</p>
+  
+  <h2>Contact Us</h2>
+  <p>If you have questions or would like to place an order, you can reach us via email at <a href="mailto:sales@smashhub.example">sales@smashhub.example</a>.</p>
 </main>
 
-<footer>© <span id="year"></span> SmashHub</footer>
+<footer>
+  © <span id="year"></span> SmashHub
+</footer>
 
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
