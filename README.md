@@ -1,8 +1,16 @@
-# SmashHub — Badminton store (No Cart)
+# SmashHub - Badminton Gear (No Cart)
 
-Static site (HTML/CSS/JS) ready to publish on GitHub Pages.
+This is a GitHub Pages-ready website for selling badminton products. 
 
-## How to publish on GitHub Pages
+## Features
+- Products loaded dynamically from Google Sheet CSV.
+- Filters: Category, Sale, New Arrivals.
+- Search bar.
+- Product modal with order info and email link.
+- No shopping cart.
 
-1. Create a new GitHub repository (example name: `smashhub-site`).
-2. Clone it locally:
+## How to Deploy
+1. Create a GitHub repository.
+2. Upload all files in this folder.
+3. Enable GitHub Pages (Settings → Pages → main branch → root).
+4. Update `SHEET_CSV_URL` in `index.html` to your Google Sheet CSV link.
